@@ -7,8 +7,6 @@ const LoginForm = ({ onSubmit, loading = false }) => {
     password: "",
   });
 
-  const isDisabled = !form.email || !form.password || loading;
-
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -18,6 +16,10 @@ const LoginForm = ({ onSubmit, loading = false }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (loading) {
+      return;
+    }
 
     if (!form.email || !form.password) {
       alert("Email dan password wajib diisi");
@@ -41,7 +43,10 @@ const LoginForm = ({ onSubmit, loading = false }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium mb-2 text-gray-700"
+          >
             Email Address
           </label>
           <div className="flex items-center bg-[#d6cfa3] rounded-xl px-4 py-3">
@@ -59,7 +64,10 @@ const LoginForm = ({ onSubmit, loading = false }) => {
         {/* Password */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <span className="text-xs text-green-700 cursor-pointer">
@@ -69,6 +77,7 @@ const LoginForm = ({ onSubmit, loading = false }) => {
 
           <div className="flex items-center bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
+              id="password"
               type="password"
               name="password"
               placeholder="********"
@@ -88,8 +97,7 @@ const LoginForm = ({ onSubmit, loading = false }) => {
         {/* Button */}
         <button
           type="submit"
-          disabled={isDisabled}
-          className={`w-full py-4 rounded-xl text-white font-medium transition ${isDisabled ? "bg-gray-400" : "bg-gradient-to-r from-green-800 to-green-600 hover:opacity-90"}`}
+          className="w-full py-4 rounded-xl text-white font-medium transition bg-gradient-to-r from-green-800 to-green-600 hover:opacity-90"
         >
           {loading ? "Loading..." : "Sign In to Hub →"}
         </button>
