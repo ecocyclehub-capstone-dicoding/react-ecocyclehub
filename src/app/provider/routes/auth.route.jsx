@@ -4,7 +4,7 @@ import RegisterPage from "../../../pages/register";
 
 const authRoutes = [
   {
-    path: "/",
+    path: "/login",
     element: <LoginPage />,
   },
   {
