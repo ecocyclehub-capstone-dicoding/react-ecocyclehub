@@ -1,31 +1,44 @@
 import { useState } from "react";
-import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import PropTypes from "prop-types";
 
-const RegisterForm = ({ onSubmit, loading = false }) => {
+const RegisterForm = ({ onSubmit, loading, error }) => {
   const [form, setForm] = useState({
-    fullName: "",
+    name: "",
     email: "",
     password: "",
   });
 
-  const isDisabled = !form.fullName || !form.email || !form.password || loading;
-
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!form.fullName || !form.email || !form.password) {
+    // cegah spam saat loading
+    if (loading) return;
+
+    // VALIDATION
+    if (!form.name || !form.email || !form.password) {
       alert("Semua field wajib diisi");
       return;
     }
 
-    onSubmit?.(form);
+    if (form.password.length < 8) {
+      alert("Password minimal 8 karakter");
+      return;
+    }
+
+    onSubmit({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      password: form.password,
+    });
   };
 
   return (
@@ -33,37 +46,46 @@ const RegisterForm = ({ onSubmit, loading = false }) => {
       <h2 className="text-3xl font-semibold text-[#1f1f1f] mb-2">
         Create Account
       </h2>
-      <p className="text-sm text-gray-500 mb-8">
+
+      <p className="text-sm text-gray-500 mb-6">
         Begin your journey towards zero waste today.
       </p>
 
+      {/* ERROR FROM API */}
+      {error && (
+        <div className="mb-4 text-sm text-red-600 bg-red-100 p-3 rounded-lg">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Full Name */}
+        {/* NAME */}
         <div>
           <label className="block text-sm mb-2 text-gray-700">Full Name</label>
-          <div className="flex items-center bg-[#d6cfa3] rounded-xl px-4 py-3 gap-3">
-            <FaUser />
+
+          <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
               type="text"
-              name="fullName"
+              name="name"
               placeholder="e.g. Jane Doe"
-              value={form.fullName}
+              value={form.name}
               onChange={handleChange}
               className="bg-transparent outline-none w-full text-sm"
             />
           </div>
         </div>
 
-        {/* Email */}
+        {/* EMAIL */}
         <div>
           <label className="block text-sm mb-2 text-gray-700">
             Email Address
           </label>
-          <div className="flex items-center bg-[#d6cfa3] rounded-xl px-4 py-3 gap-3">
-            <FaEnvelope />
+
+          <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
               type="email"
               name="email"
+              autoComplete="email"
               placeholder="jane@example.com"
               value={form.email}
               onChange={handleChange}
@@ -72,40 +94,51 @@ const RegisterForm = ({ onSubmit, loading = false }) => {
           </div>
         </div>
 
-        {/* Password */}
+        {/* PASSWORD */}
         <div>
           <label className="block text-sm mb-2 text-gray-700">Password</label>
-          <div className="flex items-center bg-[#d6cfa3] rounded-xl px-4 py-3 gap-3">
-            <FaLock />
+
+          <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
               type="password"
               name="password"
+              autoComplete="new-password"
               placeholder="********"
               value={form.password}
               onChange={handleChange}
               className="bg-transparent outline-none w-full text-sm"
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Must be at least 8 characters.
-          </p>
+
+          <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
         </div>
 
-        {/* Button */}
+        {/* BUTTON */}
         <button
           type="submit"
-          disabled={isDisabled}
+          disabled={loading}
           className={`w-full py-4 rounded-xl text-white font-medium transition ${
-            isDisabled
+            loading
               ? "bg-gray-400"
               : "bg-gradient-to-r from-green-800 to-green-600 hover:opacity-90"
           }`}
         >
-          {loading ? "Loading..." : "Sign Up →"}
+          {loading ? "Creating account..." : "Sign Up →"}
         </button>
       </form>
     </div>
   );
+};
+
+RegisterForm.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  error: PropTypes.string,
+};
+
+RegisterForm.defaultProps = {
+  loading: false,
+  error: null,
 };
 
 export default RegisterForm;
