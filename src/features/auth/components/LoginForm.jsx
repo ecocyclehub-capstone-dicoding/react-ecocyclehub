@@ -1,120 +1,166 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
+import { MdVisibility, MdVisibilityOff, MdArrowForward } from "react-icons/md";
+import useLoginForm from "./useLoginForm";
 
-const LoginForm = ({ onSubmit, loading, error }) => {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+// ── Reusable sub-components ───────────────────────────────────────────────
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+const InputField = ({ label, id, error, rightElement, ...props }) => (
+  <div className="flex flex-col gap-1.5">
+    {label && (
+      <label htmlFor={id} className="text-sm font-semibold text-gray-700">
+        {label}
+      </label>
+    )}
+    <div className="relative">
+      <input
+        id={id}
+        className={[
+          "w-full rounded-xl border bg-[#edeade] px-4 py-3 text-sm text-gray-800",
+          "placeholder:text-gray-400 outline-none transition-all duration-200",
+          rightElement && "pr-11",
+          error
+            ? "border-red-400 focus:ring-2 focus:ring-red-100"
+            : "border-transparent focus:border-green-600 focus:ring-2 focus:ring-green-100",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        {...props}
+      />
+      {rightElement && (
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+          {rightElement}
+        </div>
+      )}
+    </div>
+    {error && (
+      <p className="flex items-center gap-1 text-xs text-red-500">
+        <span>⚠</span> {error}
+      </p>
+    )}
+  </div>
+);
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+const SubmitButton = ({ isLoading, children }) => (
+  <button
+    type="submit"
+    disabled={isLoading}
+    className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1a3d1f]
+      px-4 py-3 text-sm font-semibold tracking-wide text-white transition-all
+      duration-200 hover:bg-[#234d29] active:bg-[#163319]
+      disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    {isLoading ? (
+      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+    ) : (
+      children
+    )}
+  </button>
+);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // cegah spam klik saat loading
-    if (loading) return;
-
-    if (!form.email || !form.password) {
-      alert("Email dan password wajib diisi");
-      return;
-    }
-
-    onSubmit({
-      email: form.email.trim(),
-      password: form.password,
-    });
-  };
+// ── LoginForm ─────────────────────────────────────────────────────────────
+const LoginForm = () => {
+  const {
+    fields,
+    errors,
+    apiError,
+    isLoading,
+    showPassword,
+    handleChange,
+    togglePassword,
+    handleSubmit,
+  } = useLoginForm();
 
   return (
-    <div className="w-full max-w-md bg-[#f5f5f3] p-10 rounded-3xl shadow-lg">
-      <h2 className="text-3xl font-semibold text-[#1f1f1f] mb-2">
-        Welcome Back
-      </h2>
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      {/* Heading */}
+      <div>
+        <h1 className="text-2xl font-extrabold text-gray-900">Welcome Back</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Enter your credentials to access the hub.
+        </p>
+      </div>
 
-      <p className="text-sm text-gray-500 mb-6">
-        Enter your credentials to access the hub.
-      </p>
-
-      {/* ERROR FROM API */}
-      {error && (
-        <div className="mb-4 text-sm text-red-600 bg-red-100 p-3 rounded-lg">
-          {error}
+      {/* API Error */}
+      {apiError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {apiError}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* EMAIL */}
-        <div>
-          <label htmlFor="email" className="block text-sm mb-2 text-gray-700">
-            Email Address
-          </label>
+      {/* Email */}
+      <InputField
+        label="Email Address"
+        id="email"
+        type="email"
+        name="email"
+        placeholder="name@company.com"
+        value={fields.email}
+        onChange={handleChange}
+        error={errors.email}
+        autoComplete="email"
+      />
 
-          <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
-            <input
-              id="email"
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="name@company.com"
-              value={form.email}
-              onChange={handleChange}
-              className="bg-transparent outline-none w-full text-sm"
-            />
-          </div>
-        </div>
-
-        {/* PASSWORD */}
-        <div>
+      {/* Password */}
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between">
           <label
             htmlFor="password"
-            className="block text-sm mb-2 text-gray-700"
+            className="text-sm font-semibold text-gray-700"
           >
             Password
           </label>
-
-          <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
-            <input
-              id="password"
-              type="password"
-              name="password"
-              autoComplete="current-password"
-              placeholder="********"
-              value={form.password}
-              onChange={handleChange}
-              className="bg-transparent outline-none w-full text-sm"
-            />
-          </div>
+          <button
+            type="button"
+            className="text-xs font-bold text-green-700 hover:underline"
+          >
+            Forgot?
+          </button>
         </div>
+        <InputField
+          id="password"
+          type={showPassword ? "text" : "password"}
+          name="password"
+          placeholder="••••••••"
+          value={fields.password}
+          onChange={handleChange}
+          error={errors.password}
+          autoComplete="current-password"
+          rightElement={
+            <button
+              type="button"
+              onClick={togglePassword}
+              className="flex items-center text-gray-400 transition-colors hover:text-gray-600"
+              aria-label={
+                showPassword ? "Sembunyikan password" : "Tampilkan password"
+              }
+            >
+              {showPassword ? (
+                <MdVisibilityOff size={18} />
+              ) : (
+                <MdVisibility size={18} />
+              )}
+            </button>
+          }
+        />
+      </div>
 
-        {/* BUTTON */}
-        <button
-          type="submit"
-          className="w-full py-4 rounded-xl text-white font-medium transition bg-gradient-to-r from-green-800 to-green-600 hover:opacity-90"
+      {/* Submit */}
+      <SubmitButton isLoading={isLoading}>
+        Sign In to Hub <MdArrowForward size={16} />
+      </SubmitButton>
+
+      {/* Link register */}
+      <p className="text-center text-sm text-gray-500">
+        New to the platform?{" "}
+        <Link
+          to="/register"
+          className="font-bold text-green-700 hover:underline"
         >
-          {loading ? "Signing in..." : "Sign In to Hub →"}
-        </button>
-      </form>
-    </div>
+          Create an Account
+        </Link>
+      </p>
+    </form>
   );
-};
-
-LoginForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-};
-
-LoginForm.defaultProps = {
-  loading: false,
-  error: null,
 };
 
 export default LoginForm;

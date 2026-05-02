@@ -1,11 +1,6 @@
-import React from "react";
 import NotFoundPage from "@/pages/not-found";
 
-const notFoundRoutes = [
-  {
-    path: "*",
-    element: <NotFoundPage />,
-  },
-];
-
-export default notFoundRoutes;
+export const notFoundRoute = {
+  path: "*",
+  element: <NotFoundPage />,
+};

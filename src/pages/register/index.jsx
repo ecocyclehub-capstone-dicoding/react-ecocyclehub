@@ -1,44 +1,34 @@
-import { useNavigate } from "react-router-dom";
-import HeroPanel from "@/features/auth/components/HeroPanel";
+import { MdRecycling } from "react-icons/md";
 import AuthLayout from "@/shared/layouts/AuthLayout";
+import HeroPanel from "@/features/auth/components/HeroPanel";
 import RegisterForm from "@/features/auth/components/RegisterForm";
-import { useAuth } from "@/entities/auth/hooks/useAuth";
 
-const RegisterPage = () => {
-  const navigate = useNavigate();
+const RegisterPage = () => (
+  <AuthLayout>
+    {/* Hero kiri — beda foto dan teks */}
+    <HeroPanel
+      imageUrl="https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=1200&q=80"
+      title="Bergabunglah bersama ribuan nasabah bank sampah digital."
+      subtitle="Daftarkan diri dan mulai berkontribusi untuk Indonesia yang lebih bersih dan lestari."
+      widthClass="lg:w-[45%]"
+      showBadges={false}
+    />
 
-  const { register, loading, error } = useAuth();
+    {/* Form kanan */}
+    <div className="flex flex-1 items-center justify-center px-6 py-12">
+      <div className="w-full max-w-[400px]">
+        {/* Logo mobile */}
+        <div className="mb-8 flex items-center gap-2.5 lg:hidden">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green-700">
+            <MdRecycling size={20} className="text-white" />
+          </div>
+          <span className="text-lg font-bold text-gray-800">EcoCycle Hub</span>
+        </div>
 
-  const handleRegister = async (data) => {
-    try {
-      const result = await register(data);
-
-      console.log("SUCCESS REGISTER:", result);
-
-      // 🔥 redirect tanpa delay
-      navigate("/login", {
-        state: { successMessage: "Account berhasil dibuat" },
-      });
-    } catch (err) {
-      console.log("REGISTER ERROR");
-    }
-  };
-
-  return (
-    <AuthLayout left={<HeroPanel />}>
-      <RegisterForm onSubmit={handleRegister} loading={loading} error={error} />
-
-      <p className="text-sm text-center mt-6 text-gray-600">
-        Already have an account?{" "}
-        <span
-          onClick={() => navigate("/login")}
-          className="text-green-700 font-medium cursor-pointer hover:underline"
-        >
-          Login here
-        </span>
-      </p>
-    </AuthLayout>
-  );
-};
+        <RegisterForm />
+      </div>
+    </div>
+  </AuthLayout>
+);
 
 export default RegisterPage;

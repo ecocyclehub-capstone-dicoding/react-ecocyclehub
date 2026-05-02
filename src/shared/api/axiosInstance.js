@@ -1,92 +1,54 @@
 import axios from "axios";
-import { tokenService } from "@/shared/lib/tokenService";
-
-const BASE_URL = import.meta.env.VITE_API_URL;
+import tokenService from "@/shared/lib/tokenService";
 
 export const axiosInstance = axios.create({
-  baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: import.meta.env.VITE_API_BASE_URL, // http://127.0.0.1:8000/api
+  headers: { "Content-Type": "application/json" },
+  timeout: 10_000,
 });
 
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach((p) => {
-    if (error) p.reject(error);
-    else p.resolve(token);
-  });
-  failedQueue = [];
-};
-
+// ── Request: sisipkan access token ────────────────────────────────────────
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = tokenService.getAccessToken();
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
+    const token = tokenService.getAccess();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error),
 );
 
+// ── Response: auto-refresh jika 401 ──────────────────────────────────────
 axiosInstance.interceptors.response.use(
-  (res) => res,
+  (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const original = error.config;
 
-    if (error.response?.status !== 401 || originalRequest._retry) {
-      return Promise.reject(error);
+    // Kalau 401 dan bukan request refresh itu sendiri
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+
+      try {
+        const refresh = tokenService.getRefresh();
+        if (!refresh) throw new Error("No refresh token");
+
+        // Hit endpoint refresh — response: { data: { access_token } }
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/auth/refresh/`,
+          { refresh },
+          { headers: { "Content-Type": "application/json" } },
+        );
+
+        const newAccess = data.data.access_token;
+        tokenService.setTokens(newAccess, null); // hanya update access
+        original.headers.Authorization = `Bearer ${newAccess}`;
+
+        return axiosInstance(original); // retry request awal
+      } catch {
+        tokenService.clearTokens();
+        window.location.href = "/login";
+      }
     }
 
-    if (originalRequest.url?.includes("/auth/refresh-token/")) {
-      tokenService.clearTokens();
-      window.location.href = "/login";
-      return Promise.reject(error);
-    }
-
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      })
-        .then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return axiosInstance(originalRequest);
-        })
-        .catch((err) => Promise.reject(err));
-    }
-
-    originalRequest._retry = true;
-    isRefreshing = true;
-
-    try {
-      const refreshToken = tokenService.getRefreshToken();
-
-      const res = await axios.post(`${BASE_URL}/auth/refresh-token/`, {
-        refresh_token: refreshToken,
-      });
-
-      const { access_token } = res.data.data;
-
-      tokenService.setTokens(access_token, refreshToken);
-
-      axiosInstance.defaults.headers.Authorization = `Bearer ${access_token}`;
-      originalRequest.headers.Authorization = `Bearer ${access_token}`;
-
-      processQueue(null, access_token);
-
-      return axiosInstance(originalRequest);
-    } catch (err) {
-      processQueue(err, null);
-      tokenService.clearTokens();
-      window.location.href = "/login";
-      return Promise.reject(err);
-    } finally {
-      isRefreshing = false;
-    }
+    return Promise.reject(error);
   },
 );

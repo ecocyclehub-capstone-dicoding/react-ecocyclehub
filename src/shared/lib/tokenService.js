@@ -1,17 +1,21 @@
-const ACCESS_TOKEN = "access_token";
-const REFRESH_TOKEN = "refresh_token";
+const KEYS = {
+  ACCESS: "access_token",
+  REFRESH: "refresh_token",
+};
 
-export const tokenService = {
-  getAccessToken: () => localStorage.getItem(ACCESS_TOKEN),
-  getRefreshToken: () => localStorage.getItem(REFRESH_TOKEN),
+const tokenService = {
+  getAccess: () => localStorage.getItem(KEYS.ACCESS),
+  getRefresh: () => localStorage.getItem(KEYS.REFRESH),
 
   setTokens: (access, refresh) => {
-    if (access) localStorage.setItem(ACCESS_TOKEN, access);
-    if (refresh) localStorage.setItem(REFRESH_TOKEN, refresh);
+    localStorage.setItem(KEYS.ACCESS, access);
+    if (refresh) localStorage.setItem(KEYS.REFRESH, refresh);
   },
 
   clearTokens: () => {
-    localStorage.removeItem(ACCESS_TOKEN);
-    localStorage.removeItem(REFRESH_TOKEN);
+    localStorage.removeItem(KEYS.ACCESS);
+    localStorage.removeItem(KEYS.REFRESH);
   },
 };
+
+export default tokenService;
