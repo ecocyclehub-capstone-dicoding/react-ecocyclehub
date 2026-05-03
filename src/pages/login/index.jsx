@@ -3,15 +3,26 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";
 import LoginForm from "@/features/auth/components/LoginForm";
+import { useAuth } from "@/entities/auth/hooks/useAuth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const successMessage = location.state?.successMessage;
+  const { login, loading, error } = useAuth();
 
-  const handleLogin = (data) => {
-    console.log("login:", data);
+  const handleLogin = async (data) => {
+    try {
+      const result = await login(data);
+
+      console.log("SUCCESS LOGIN:", result);
+
+      // 🔥 redirect setelah login
+      navigate("/dashboard");
+    } catch (err) {
+      console.log("LOGIN ERROR");
+    }
   };
 
   return (
