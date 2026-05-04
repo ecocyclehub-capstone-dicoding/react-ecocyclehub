@@ -1,18 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";
 import RegisterForm from "@/features/auth/components/RegisterForm";
+import { authApi } from "@/entities/auth/api/auth.api";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = (data) => {
-    console.log("register:", data);
+  const handleRegister = async (data) => {
+    try {
+      setError(null);
+      setLoading(true);
+      await authApi.register(data);
 
-    navigate("/login", {
-      state: { successMessage: "Registrasi berhasil, silakan login." },
-    });
+      navigate("/login", {
+        state: { successMessage: "Registrasi berhasil, silakan login." },
+      });
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Registrasi gagal. Silakan coba lagi.";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,7 +40,13 @@ const RegisterPage = () => {
         />
       }
     >
-      <RegisterForm onSubmit={handleRegister} />
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+
+      <RegisterForm onSubmit={handleRegister} loading={loading} />
 
       <p className="text-sm text-center mt-6 text-gray-600">
         Already have an account?{" "}

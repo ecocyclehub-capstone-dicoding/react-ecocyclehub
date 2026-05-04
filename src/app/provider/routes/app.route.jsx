@@ -2,7 +2,7 @@ import React, { lazy, Suspense } from "react";
 import { MdRecycling } from "react-icons/md";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { authRoutes } from "./auth.route";
-// import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
 import { notFoundRoutes } from "./not-found.route";
 
 const DashboardPage = lazy(() => import("@/pages/dashboard"));
@@ -25,15 +25,15 @@ export const router = createBrowserRouter([
 
   ...authRoutes,
 
-  //   {
-  //     element: <ProtectedRoute allowedRoles={["customer"]}/>,
-  //     children=[{ path: "/dashboard", element: wrap(DashboardPage) }],
-  //   },
+  {
+    element: <ProtectedRoute allowedRoles={["customer"]} />,
+    children: [{ path: "/dashboard", element: wrap(DashboardPage) }],
+  },
 
-  //   {
-  //     element: <ProtectedRoute allowedRoles={["admin"]}/>,
-  //     children=[{ path: "/admin/dashboard", element: wrap(AdminDashboardPage) }],
-  //   },
+  {
+    element: <ProtectedRoute allowedRoles={["admin"]} />,
+    children: [{ path: "/admin/dashboard", element: wrap(AdminDashboardPage) }],
+  },
 
   notFoundRoutes,
 ]);
