@@ -1,53 +1,72 @@
 import { useState } from "react";
 import { authApi } from "../api/auth.api";
-import { tokenService } from "@/shared/lib/tokenService";
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [message, setMessage] = useState(null);
 
-  const parseError = (err) => {
-    if (err.response?.data?.message) {
-      return err.response.data.message;
-    }
-
-    if (err.response?.data?.errors) {
-      return Object.values(err.response.data.errors).flat().join(", ");
-    }
-
-    return "Something went wrong";
-  };
-
-  const login = async (payload) => {
+  const login = async (data) => {
     try {
       setLoading(true);
       setError(null);
+      setFieldErrors({});
+      setMessage(null);
 
-      const data = await authApi.login(payload);
+      const res = await authApi.login(data);
 
-      tokenService.setTokens(data.access_token, data.refresh_token);
+      const { access_token, refresh_token } = res.data;
 
-      return data;
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("refresh_token", refresh_token);
+
+      setMessage(res.message);
+
+      return res;
     } catch (err) {
-      const msg = parseError(err);
-      setError(msg);
+      const res = err.response?.data;
+
+      if (res?.errors) {
+        if (res.errors.non_field_errors) {
+          setError(res.errors.non_field_errors[0]);
+          setFieldErrors({});
+        } else {
+          setFieldErrors(res.errors);
+          setError(null);
+        }
+      } else {
+        setError(res?.message || "Login gagal");
+      }
+
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (payload) => {
+  const register = async (data) => {
     try {
       setLoading(true);
       setError(null);
+      setFieldErrors({});
+      setMessage(null);
 
-      const data = await authApi.register(payload);
+      const res = await authApi.register(data);
 
-      return data;
+      setMessage(res.data.message);
+
+      return res.data;
     } catch (err) {
-      const msg = parseError(err);
-      setError(msg);
+      const res = err.response?.data;
+
+      if (res?.errors) {
+        setFieldErrors(res.errors);
+        setError(null);
+      } else {
+        setError(res?.message || "Registrasi gagal");
+      }
+
       throw err;
     } finally {
       setLoading(false);
@@ -59,5 +78,7 @@ export const useAuth = () => {
     register,
     loading,
     error,
+    fieldErrors,
+    message,
   };
 };

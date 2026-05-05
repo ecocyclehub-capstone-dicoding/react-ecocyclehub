@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const RegisterForm = ({ onSubmit, loading, error }) => {
+const RegisterForm = ({ onSubmit, loading, error, fieldErrors }) => {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -19,7 +19,9 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
       [name]: value,
     }));
 
-    setLocalError(null);
+    if (fieldErrors?.[name]) {
+      fieldErrors[name] = null;
+    }
   };
 
   const handleSubmit = (e) => {
@@ -27,15 +29,7 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
 
     if (loading) return;
 
-    if (!form.name || !form.email || !form.password) {
-      setLocalError("Semua field wajib diisi");
-      return;
-    }
-
-    if (form.password.length < 8) {
-      setLocalError("Password minimal 8 karakter");
-      return;
-    }
+    setLocalError(null);
 
     if (form.password !== form.confirmPassword) {
       setLocalError("Password tidak sama");
@@ -57,10 +51,10 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
         Begin your journey towards zero waste today.
       </p>
 
-      {/* ERROR */}
-      {(error || localError) && (
+      {/* GLOBAL ERROR */}
+      {!Object.keys(fieldErrors || {}).length && error && (
         <div className="mb-4 text-sm text-red-600 bg-red-100 p-3 rounded-lg">
-          {error || localError}
+          {error}
         </div>
       )}
 
@@ -77,6 +71,9 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
               className="bg-transparent w-full outline-none text-sm"
             />
           </div>
+          {fieldErrors?.name && (
+            <p className="text-xs text-red-500 mt-1">{fieldErrors.name[0]}</p>
+          )}
         </div>
 
         {/* EMAIL */}
@@ -92,6 +89,9 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
               className="bg-transparent w-full outline-none text-sm"
             />
           </div>
+          {fieldErrors?.email && (
+            <p className="text-xs text-red-500 mt-1">{fieldErrors.email[0]}</p>
+          )}
         </div>
 
         {/* PASSWORD */}
@@ -107,6 +107,15 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
               className="bg-transparent w-full outline-none text-sm"
             />
           </div>
+          {fieldErrors?.password && (
+            <p className="text-xs text-red-500 mt-1">
+              {fieldErrors.password[0]}
+            </p>
+          )}
+
+          {localError && (
+            <div className="text-xs text-red-500 mt-1">{localError}</div>
+          )}
         </div>
 
         {/* CONFIRM PASSWORD */}
@@ -122,6 +131,9 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
               className="bg-transparent w-full outline-none text-sm"
             />
           </div>
+          {localError && (
+            <div className="text-xs text-red-500 mt-1">{localError}</div>
+          )}
         </div>
 
         {/* BUTTON */}
@@ -140,11 +152,13 @@ RegisterForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   error: PropTypes.string,
+  fieldErrors: PropTypes.object,
 };
 
 RegisterForm.defaultProps = {
   loading: false,
   error: null,
+  fieldErrors: {},
 };
 
 export default RegisterForm;

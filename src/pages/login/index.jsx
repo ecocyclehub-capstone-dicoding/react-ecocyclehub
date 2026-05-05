@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";
 import LoginForm from "@/features/auth/components/LoginForm";
@@ -7,22 +7,17 @@ import { useAuth } from "@/entities/auth/hooks/useAuth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const successMessage = location.state?.successMessage;
-  const { login, loading, error } = useAuth();
+  const { login, loading, error, fieldErrors } = useAuth();
 
   const handleLogin = async (data) => {
     try {
-      const result = await login(data);
+      const res = await login(data);
 
-      console.log("SUCCESS LOGIN:", result);
+      console.log("LOGIN SUCCESS:", res);
 
-      // 🔥 redirect setelah login
       navigate("/dashboard");
-    } catch (err) {
-      console.log("LOGIN ERROR");
-    }
+    } catch {}
   };
 
   return (
@@ -35,11 +30,12 @@ const LoginPage = () => {
         />
       }
     >
-      {successMessage && (
-        <div className="mb-4 text-green-700 text-sm">{successMessage}</div>
-      )}
-
-      <LoginForm onSubmit={handleLogin} />
+      <LoginForm
+        onSubmit={handleLogin}
+        loading={loading}
+        error={error}
+        fieldErrors={fieldErrors}
+      />
 
       <p className="text-sm text-center mt-6 text-gray-600">
         New to the platform?{" "}
