@@ -1,12 +1,15 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const RegisterForm = ({ onSubmit, loading, error }) => {
+const RegisterForm = ({ onSubmit, loading, error, fieldErrors }) => {
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+
+  const [localError, setLocalError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,22 +18,21 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
       ...prev,
       [name]: value,
     }));
+
+    if (fieldErrors?.[name]) {
+      fieldErrors[name] = null;
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // cegah spam saat loading
     if (loading) return;
 
-    // VALIDATION
-    if (!form.name || !form.email || !form.password) {
-      alert("Semua field wajib diisi");
-      return;
-    }
+    setLocalError(null);
 
-    if (form.password.length < 8) {
-      alert("Password minimal 8 karakter");
+    if (form.password !== form.confirmPassword) {
+      setLocalError("Password tidak sama");
       return;
     }
 
@@ -43,16 +45,14 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
 
   return (
     <div className="w-full max-w-md bg-[#f5f5f3] p-10 rounded-3xl shadow-lg">
-      <h2 className="text-3xl font-semibold text-[#1f1f1f] mb-2">
-        Create Account
-      </h2>
+      <h2 className="text-3xl font-semibold mb-2">Create Account</h2>
 
       <p className="text-sm text-gray-500 mb-6">
         Begin your journey towards zero waste today.
       </p>
 
-      {/* ERROR FROM API */}
-      {error && (
+      {/* GLOBAL ERROR */}
+      {!Object.keys(fieldErrors || {}).length && error && (
         <div className="mb-4 text-sm text-red-600 bg-red-100 p-3 rounded-lg">
           {error}
         </div>
@@ -61,69 +61,87 @@ const RegisterForm = ({ onSubmit, loading, error }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* NAME */}
         <div>
-          <label className="block text-sm mb-2 text-gray-700">Full Name</label>
-
+          <label className="text-sm mb-2 block">Full Name</label>
           <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
-              type="text"
               name="name"
-              placeholder="e.g. Jane Doe"
               value={form.name}
               onChange={handleChange}
-              className="bg-transparent outline-none w-full text-sm"
+              placeholder="Jane Doe"
+              className="bg-transparent w-full outline-none text-sm"
             />
           </div>
+          {fieldErrors?.name && (
+            <p className="text-xs text-red-500 mt-1">{fieldErrors.name[0]}</p>
+          )}
         </div>
 
         {/* EMAIL */}
         <div>
-          <label className="block text-sm mb-2 text-gray-700">
-            Email Address
-          </label>
-
+          <label className="text-sm mb-2 block">Email</label>
           <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
-              type="email"
               name="email"
-              autoComplete="email"
-              placeholder="jane@example.com"
+              type="email"
               value={form.email}
               onChange={handleChange}
-              className="bg-transparent outline-none w-full text-sm"
+              placeholder="name@company.com"
+              className="bg-transparent w-full outline-none text-sm"
             />
           </div>
+          {fieldErrors?.email && (
+            <p className="text-xs text-red-500 mt-1">{fieldErrors.email[0]}</p>
+          )}
         </div>
 
         {/* PASSWORD */}
         <div>
-          <label className="block text-sm mb-2 text-gray-700">Password</label>
-
+          <label className="text-sm mb-2 block">Password</label>
           <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
-              type="password"
               name="password"
-              autoComplete="new-password"
-              placeholder="********"
+              type="password"
               value={form.password}
               onChange={handleChange}
-              className="bg-transparent outline-none w-full text-sm"
+              placeholder="********"
+              className="bg-transparent w-full outline-none text-sm"
             />
           </div>
+          {fieldErrors?.password && (
+            <p className="text-xs text-red-500 mt-1">
+              {fieldErrors.password[0]}
+            </p>
+          )}
 
-          <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+          {localError && (
+            <div className="text-xs text-red-500 mt-1">{localError}</div>
+          )}
+        </div>
+
+        {/* CONFIRM PASSWORD */}
+        <div>
+          <label className="text-sm mb-2 block">Confirm Password</label>
+          <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
+            <input
+              name="confirmPassword"
+              type="password"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="********"
+              className="bg-transparent w-full outline-none text-sm"
+            />
+          </div>
+          {localError && (
+            <div className="text-xs text-red-500 mt-1">{localError}</div>
+          )}
         </div>
 
         {/* BUTTON */}
         <button
           type="submit"
-          disabled={loading}
-          className={`w-full py-4 rounded-xl text-white font-medium transition ${
-            loading
-              ? "bg-gray-400"
-              : "bg-gradient-to-r from-green-800 to-green-600 hover:opacity-90"
-          }`}
+          className="w-full py-4 rounded-xl text-white bg-gradient-to-r from-green-800 to-green-600"
         >
-          {loading ? "Creating account..." : "Sign Up →"}
+          {loading ? "Signing up..." : "Sign Up →"}
         </button>
       </form>
     </div>
@@ -134,11 +152,13 @@ RegisterForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   error: PropTypes.string,
+  fieldErrors: PropTypes.object,
 };
 
 RegisterForm.defaultProps = {
   loading: false,
   error: null,
+  fieldErrors: {},
 };
 
 export default RegisterForm;

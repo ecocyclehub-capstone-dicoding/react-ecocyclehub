@@ -1,8 +1,6 @@
 import React from "react";
-import RoutesProvider from "./provider/routes";
+import AppProvider from "./provider";
 
-const App = () => {
-  return <RoutesProvider />;
-};
+const App = () => <AppProvider />;
 
 export default App;

@@ -7,7 +7,7 @@ export const authApi = {
       password,
     });
 
-    return res.data.data;
+    return res.data;
   },
 
   register: async ({ name, email, password }) => {
@@ -17,7 +17,7 @@ export const authApi = {
       password,
     });
 
-    return res.data.data;
+    return res.data;
   },
 
   getMe: async () => {
