@@ -2,6 +2,7 @@ import React from "react";
 import { MdRecycling } from "react-icons/md";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/entities/auth/hooks/useAuth";
+import { getDashboardPathByRole, normalizeRole } from "@/entities/auth/lib/roleRedirect";
 
 const Spinner = () => (
   <div
@@ -26,8 +27,10 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
-  if (allowedRoles?.length && !allowedRoles.includes(user?.role?.key)) {
-    return <Navigate to="/login" replace />;
+  const role = normalizeRole(user?.role) || "customer";
+
+  if (allowedRoles?.length && !allowedRoles.includes(role)) {
+    return <Navigate to={getDashboardPathByRole(role)} replace />;
   }
 
   return <Outlet />;
