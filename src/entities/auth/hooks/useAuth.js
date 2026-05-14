@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { authApi } from "../api/auth.api";
+import { getRoleFromLoginResponse } from "../lib/roleRedirect";
+import { tokenService } from "@/shared/lib/tokenService";
+import { userSession } from "@/shared/lib/userSession";
 
 export const useAuth = () => {
+  const [user, setUser] = useState(() => userSession.getUser());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -17,9 +21,18 @@ export const useAuth = () => {
       const res = await authApi.login(data);
 
       const { access_token, refresh_token } = res.data;
+      const role = getRoleFromLoginResponse(res) || "customer";
+      const loggedInUser = {
+        ...(res.data?.user || {}),
+        role: {
+          ...(typeof res.data?.user?.role === "object" ? res.data.user.role : {}),
+          key: role,
+        },
+      };
 
-      localStorage.setItem("access_token", access_token);
-      localStorage.setItem("refresh_token", refresh_token);
+      tokenService.setTokens(access_token, refresh_token);
+      userSession.setUser(loggedInUser, role);
+      setUser(loggedInUser);
 
       setMessage(res.message);
 
@@ -76,6 +89,9 @@ export const useAuth = () => {
   return {
     login,
     register,
+    user,
+    isAuthenticated: Boolean(tokenService.getAccessToken()),
+    isLoading: loading,
     loading,
     error,
     fieldErrors,

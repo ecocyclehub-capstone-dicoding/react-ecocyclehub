@@ -17,7 +17,9 @@ const RegisterPage = () => {
       navigate("/login", {
         state: { successMessage: message },
       });
-    } catch {}
+    } catch {
+      return;
+    }
   };
 
   return (

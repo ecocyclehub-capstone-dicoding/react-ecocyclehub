@@ -4,6 +4,10 @@ import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";
 import LoginForm from "@/features/auth/components/LoginForm";
 import { useAuth } from "@/entities/auth/hooks/useAuth";
+import {
+  getDashboardPathByRole,
+  getRoleFromLoginResponse,
+} from "@/entities/auth/lib/roleRedirect";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -16,8 +20,12 @@ const LoginPage = () => {
 
       console.log("LOGIN SUCCESS:", res);
 
-      navigate("/dashboard");
-    } catch {}
+      navigate(getDashboardPathByRole(getRoleFromLoginResponse(res)), {
+        replace: true,
+      });
+    } catch {
+      return;
+    }
   };
 
   return (
