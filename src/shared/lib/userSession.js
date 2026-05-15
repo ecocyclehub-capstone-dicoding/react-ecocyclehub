@@ -10,20 +10,42 @@ export const userSession = {
 
       return JSON.parse(user);
     } catch (err) {
+      console.error("Failed to retrieve user session:", err);
       return null;
     }
   },
 
   getRole: () => {
-    return localStorage.getItem(USER_ROLE);
+    try {
+      return localStorage.getItem(USER_ROLE);
+    } catch (err) {
+      console.error("Failed to retrieve user role:", err);
+      return null;
+    }
   },
 
   setUser: (user, role) => {
     try {
-      if (user) localStorage.setItem(USER_SESSION, JSON.stringify(user));
-      if (role) localStorage.setItem(USER_ROLE, role);
+      if (user) {
+        localStorage.setItem(USER_SESSION, JSON.stringify(user));
+      }
+
+      if (role) {
+        localStorage.setItem(USER_ROLE, role);
+      }
+
+      return true;
     } catch (err) {
       console.error("Failed to persist user session:", err);
+
+      try {
+        localStorage.removeItem(USER_SESSION);
+        localStorage.removeItem(USER_ROLE);
+      } catch (rollbackErr) {
+        console.error("Failed to rollback partial write:", rollbackErr);
+      }
+
+      return false;
     }
   },
 

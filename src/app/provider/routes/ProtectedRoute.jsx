@@ -28,16 +28,24 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   if (isLoading) return <Spinner />;
 
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
-  const role = normalizeRole(user?.role) || "customer";
+  const role = normalizeRole(user?.role);
 
   if (!role) {
     return <Navigate to="/login" replace />;
   }
 
   if (allowedRoles?.length && !allowedRoles.includes(role)) {
-    return <Navigate to={getDashboardPathByRole(role)} replace />;
+    const dashboardPath = getDashboardPathByRole(role);
+
+    if (!dashboardPath) {
+      return <Navigate to="/login" replace />;
+    }
+
+    return <Navigate to={dashboardPath} replace />;
   }
 
   return <Outlet />;

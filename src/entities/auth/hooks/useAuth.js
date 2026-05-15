@@ -20,11 +20,14 @@ export const useAuth = () => {
 
       const res = await authApi.login(data);
 
-      const { access_token, refresh_token } = res.data;
       const role = getRoleFromLoginResponse(res);
+
       if (!role) {
         throw new Error("Invalid role received from server");
       }
+
+      const { access_token, refresh_token } = res.data;
+
       const loggedInUser = {
         ...(res.data?.user || {}),
         role: {
@@ -36,25 +39,31 @@ export const useAuth = () => {
       };
 
       tokenService.setTokens(access_token, refresh_token);
-      userSession.setUser(loggedInUser, role);
+
+      const success = userSession.setUser(loggedInUser, role);
+
+      if (!success) {
+        throw new Error("Failed to persist user session");
+      }
+
       setUser(loggedInUser);
 
       setMessage(res.message);
 
       return res;
     } catch (err) {
-      const res = err.response?.data;
+      const errorData = err.response?.data;
 
-      if (res?.errors) {
-        if (res.errors.non_field_errors) {
-          setError(res.errors.non_field_errors[0]);
+      if (errorData?.errors) {
+        if (errorData.errors.non_field_errors) {
+          setError(errorData.errors.non_field_errors[0]);
           setFieldErrors({});
         } else {
-          setFieldErrors(res.errors);
+          setFieldErrors(errorData.errors);
           setError(null);
         }
       } else {
-        setError(res?.message || "Login gagal");
+        setError(errorData?.message || err.message || "Login gagal");
       }
 
       throw err;

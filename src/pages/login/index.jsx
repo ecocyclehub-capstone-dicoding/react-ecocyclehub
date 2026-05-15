@@ -17,13 +17,19 @@ const LoginPage = () => {
   const handleLogin = async (data) => {
     try {
       const res = await login(data);
+      const role = getRoleFromLoginResponse(res);
+      const dashboardPath = getDashboardPathByRole(role);
 
-      console.log("LOGIN SUCCESS:", res);
+      if (!dashboardPath) {
+        throw new Error("Invalid role received from server");
+      }
 
-      navigate(getDashboardPathByRole(getRoleFromLoginResponse(res)), {
+      navigate(dashboardPath, {
         replace: true,
       });
-    } catch {
+    } catch (err) {
+      console.error("Login failed:", err);
+
       return;
     }
   };
