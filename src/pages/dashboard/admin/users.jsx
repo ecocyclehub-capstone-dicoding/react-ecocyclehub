@@ -1,21 +1,13 @@
-import { useEffect, useState } from "react";
-
+import { useState } from "react";
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
-
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
-
 import UserTable from "@/features/user/components/UserTable";
-
 import { useUser } from "@/entities/user/hooks/useUser";
 
 const AdminUsersPage = () => {
   const { users, loading, error, getUsers, deleteUser } = useUser();
 
   const [selectedUser, setSelectedUser] = useState(null);
-
-  useEffect(() => {
-    getUsers();
-  }, []);
 
   const handleDelete = async (user) => {
     const confirmed = window.confirm(`Delete user "${user.name}"?`);

@@ -13,8 +13,10 @@ export const useUser = () => {
     try {
       setLoading(true);
       const res = await userApi.getUsers();
-      const mapped = res.data.map(mapUser);
+      const list = Array.isArray(res) ? res : (res?.data ?? res?.results ?? []);
+      const mapped = list.map(mapUser);
       setUsers(mapped);
+      setError(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed get users");
     } finally {

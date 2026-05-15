@@ -30,6 +30,8 @@ const UserTable = ({ users, onEdit, onDelete }) => {
               <td className="p-5">
                 <div className="flex items-center gap-3">
                   <button
+                    type="button"
+                    aria-label={`Edit ${user.name}`}
                     onClick={() => onEdit(user)}
                     className="bg-yellow-100 text-yellow-700 p-2 rounded-xl"
                   >
@@ -37,6 +39,8 @@ const UserTable = ({ users, onEdit, onDelete }) => {
                   </button>
 
                   <button
+                    type="button"
+                    aria-label={`Delete ${user.name}`}
                     onClick={() => onDelete(user)}
                     className="bg-red-100 text-red-700 p-2 rounded-xl"
                   >
