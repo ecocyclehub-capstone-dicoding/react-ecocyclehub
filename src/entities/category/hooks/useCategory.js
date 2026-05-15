@@ -39,6 +39,7 @@ export const useCategory = () => {
 
   const updateCategory = async (id, payload) => {
     try {
+      setIsMutating(true);
       const res = await categoryApi.updateCategory(id, payload);
 
       await getCategories();
@@ -46,16 +47,21 @@ export const useCategory = () => {
       return res;
     } catch (err) {
       throw err;
+    } finally {
+      setIsMutating(false);
     }
   };
 
   const deleteCategory = async (id) => {
     try {
+      setIsMutating(true);
       await categoryApi.deleteCategory(id);
 
       setCategories((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
       throw err;
+    } finally {
+      setIsMutating(false);
     }
   };
 

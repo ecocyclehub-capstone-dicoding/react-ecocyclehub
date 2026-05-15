@@ -53,14 +53,12 @@ const CategoryModal = ({
     }
 
     if (isNaN(pointPerKg) || pointPerKg < 0) {
-      alert("Price per kg must be a valid non-negative number");
+      alert("Point per kg must be a valid non-negative number");
       return;
     }
 
     await onSubmit({
       name: form.name,
-      price_per_kg: Number(form.price_per_kg),
-      point_per_kg: Number(form.point_per_kg),
       price_per_kg: pricePerKg,
       point_per_kg: pointPerKg,
     });
