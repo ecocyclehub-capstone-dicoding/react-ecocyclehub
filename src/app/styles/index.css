@@ -1,5 +1,76 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
+
+@theme {
+  /* ── EcoCycle Design-System Palette ── */
+  --color-primary:                  #1b4f23;
+  --color-on-primary:               #ffffff;
+  --color-primary-container:        #346739;
+  --color-on-primary-container:     #abe3aa;
+  --color-primary-fixed:            #b7f1b6;
+  --color-primary-fixed-dim:        #9cd49c;
+  --color-on-primary-fixed:         #002107;
+  --color-on-primary-fixed-variant: #1d5125;
+  --color-inverse-primary:          #9cd49c;
+
+  --color-secondary:                  #386932;
+  --color-on-secondary:               #ffffff;
+  --color-secondary-container:        #b6eea9;
+  --color-on-secondary-container:     #3c6e36;
+  --color-secondary-fixed:            #b9f1ac;
+  --color-secondary-fixed-dim:        #9ed592;
+  --color-on-secondary-fixed:         #002202;
+  --color-on-secondary-fixed-variant: #20511d;
+
+  --color-tertiary:                   #264d26;
+  --color-on-tertiary:                #ffffff;
+  --color-tertiary-container:         #3e653b;
+  --color-on-tertiary-container:      #b4e0ac;
+  --color-tertiary-fixed:             #c1efb9;
+  --color-tertiary-fixed-dim:         #a6d29f;
+  --color-on-tertiary-fixed:          #002204;
+  --color-on-tertiary-fixed-variant:  #294f28;
+
+  --color-error:            #ba1a1a;
+  --color-on-error:         #ffffff;
+  --color-error-container:  #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-surface:                    #fffadd;
+  --color-on-surface:                 #1e1c03;
+  --color-surface-variant:            #e9e4b9;
+  --color-on-surface-variant:         #414940;
+  --color-surface-bright:             #fffadd;
+  --color-surface-dim:                #e0dcb1;
+  --color-surface-tint:               #36693b;
+  --color-surface-container-lowest:   #ffffff;
+  --color-surface-container-low:      #faf5ca;
+  --color-surface-container:          #f4efc4;
+  --color-surface-container-high:     #efeabf;
+  --color-surface-container-highest:  #e9e4b9;
+  --color-inverse-surface:            #333114;
+  --color-inverse-on-surface:         #f7f2c7;
+
+  --color-background:    #fffadd;
+  --color-on-background: #1e1c03;
+  --color-outline:        #71796f;
+  --color-outline-variant: #c1c9bd;
+
+  /* ── Typography ── */
+  --font-headline: "Manrope", sans-serif;
+  --font-display:  "Manrope", sans-serif;
+  --font-body:     "Inter", sans-serif;
+  --font-label:    "Inter", sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  -webkit-font-smoothing: antialiased;
 }

@@ -7,6 +7,7 @@ import { notFoundRoutes } from "./not-found.route";
 
 const DashboardPage = lazy(() => import("@/pages/dashboard"));
 const AdminDashboardPage = lazy(() => import("@/pages/dashboard"));
+const TransactionsPage = lazy(() => import("@/pages/transactions"));
 
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center bg-[#f5f0e0]">
@@ -27,7 +28,10 @@ export const router = createBrowserRouter([
 
   {
     element: <ProtectedRoute allowedRoles={["customer"]} />,
-    children: [{ path: "/dashboard", element: wrap(DashboardPage) }],
+    children: [
+      { path: "/dashboard", element: wrap(DashboardPage) },
+      { path: "/transactions", element: wrap(TransactionsPage) },
+    ],
   },
 
   {
