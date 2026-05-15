@@ -15,7 +15,8 @@ import { useCategory } from "@/entities/category/hooks/useCategory";
 const AdminCategoriesPage = () => {
   const {
     categories,
-    loading,
+    isMutating,
+    isFetching,
     error,
     createCategory,
     updateCategory,
@@ -57,8 +58,15 @@ const AdminCategoriesPage = () => {
       setOpenModal(false);
 
       setSelectedCategory(null);
+
+      alert(
+        selectedCategory
+          ? "Category updated successfully"
+          : "Category created successfully",
+      );
     } catch (err) {
-      console.log(err);
+      const message = err.response?.data?.message || "Failed to save category";
+      alert(message);
     }
   };
 
@@ -69,8 +77,11 @@ const AdminCategoriesPage = () => {
       setOpenDeleteModal(false);
 
       setSelectedCategory(null);
+      alert("Category deleted successfully");
     } catch (err) {
-      console.log(err);
+      const message =
+        err.response?.data?.message || "Failed to delete category";
+      alert(message);
     }
   };
 
@@ -96,7 +107,7 @@ const AdminCategoriesPage = () => {
         </div>
 
         {/* LOADING */}
-        {loading && (
+        {isFetching && (
           <div className="bg-white rounded-3xl p-6 shadow-sm">
             <p className="text-sm text-gray-500">Loading categories...</p>
           </div>
@@ -110,7 +121,7 @@ const AdminCategoriesPage = () => {
         )}
 
         {/* TABLE */}
-        {!loading && !error && (
+        {!isFetching && !error && (
           <CategoryTable
             data={categories}
             onEdit={handleEdit}
@@ -126,7 +137,7 @@ const AdminCategoriesPage = () => {
             setSelectedCategory(null);
           }}
           onSubmit={handleSubmit}
-          loading={loading}
+          loading={isMutating}
           selectedCategory={selectedCategory}
         />
 
@@ -138,7 +149,7 @@ const AdminCategoriesPage = () => {
             setSelectedCategory(null);
           }}
           onConfirm={handleDelete}
-          loading={loading}
+          loading={isMutating}
           category={selectedCategory}
         />
       </div>

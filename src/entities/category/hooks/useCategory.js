@@ -4,14 +4,13 @@ import { categoryApi } from "../api/category.api";
 
 export const useCategory = () => {
   const [categories, setCategories] = useState([]);
-
-  const [loading, setLoading] = useState(false);
-
+  const [isFetching, setIsFetching] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState(null);
 
   const getCategories = async () => {
     try {
-      setLoading(true);
+      setIsFetching(true);
 
       const res = await categoryApi.getCategories();
 
@@ -19,12 +18,13 @@ export const useCategory = () => {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch categories");
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   };
 
   const createCategory = async (payload) => {
     try {
+      setIsMutating(true);
       const res = await categoryApi.createCategory(payload);
 
       await getCategories();
@@ -32,6 +32,8 @@ export const useCategory = () => {
       return res;
     } catch (err) {
       throw err;
+    } finally {
+      setIsMutating(false);
     }
   };
 
@@ -63,7 +65,8 @@ export const useCategory = () => {
 
   return {
     categories,
-    loading,
+    isFetching,
+    isMutating,
     error,
 
     getCategories,

@@ -1,5 +1,3 @@
-import PropTypes from "prop-types";
-
 import { MdDelete, MdEdit } from "react-icons/md";
 
 const CategoryTable = ({ data, onEdit, onDelete }) => {
@@ -50,12 +48,6 @@ const CategoryTable = ({ data, onEdit, onDelete }) => {
       </table>
     </div>
   );
-};
-
-CategoryTable.propTypes = {
-  data: PropTypes.array.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
 
 export default CategoryTable;

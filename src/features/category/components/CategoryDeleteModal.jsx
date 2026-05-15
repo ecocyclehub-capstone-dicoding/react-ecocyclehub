@@ -1,11 +1,9 @@
-import PropTypes from "prop-types";
-
 const CategoryDeleteModal = ({
   open,
   onClose,
   onConfirm,
-  loading,
-  category,
+  loading = false,
+  category = null,
 }) => {
   if (!open || !category) return null;
 
@@ -54,19 +52,6 @@ const CategoryDeleteModal = ({
       </div>
     </div>
   );
-};
-
-CategoryDeleteModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-  category: PropTypes.object,
-};
-
-CategoryDeleteModal.defaultProps = {
-  loading: false,
-  category: null,
 };
 
 export default CategoryDeleteModal;

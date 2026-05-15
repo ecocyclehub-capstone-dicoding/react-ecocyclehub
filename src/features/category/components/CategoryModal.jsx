@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-import PropTypes from "prop-types";
-
 const initialForm = {
   name: "",
   price_per_kg: "",
@@ -12,8 +10,8 @@ const CategoryModal = ({
   open,
   onClose,
   onSubmit,
-  loading,
-  selectedCategory,
+  loading = false,
+  selectedCategory = null,
 }) => {
   const [form, setForm] = useState(initialForm);
 
@@ -41,10 +39,30 @@ const CategoryModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.name.trim()) {
+      alert("Category name is required");
+      return;
+    }
+
+    const pricePerKg = Number(form.price_per_kg);
+    const pointPerKg = Number(form.point_per_kg);
+
+    if (isNaN(pricePerKg) || pricePerKg < 0) {
+      alert("Price per kg must be a valid non-negative number");
+      return;
+    }
+
+    if (isNaN(pointPerKg) || pointPerKg < 0) {
+      alert("Price per kg must be a valid non-negative number");
+      return;
+    }
+
     await onSubmit({
       name: form.name,
       price_per_kg: Number(form.price_per_kg),
       point_per_kg: Number(form.point_per_kg),
+      price_per_kg: pricePerKg,
+      point_per_kg: pointPerKg,
     });
 
     setForm(initialForm);
@@ -140,14 +158,6 @@ const CategoryModal = ({
       </div>
     </div>
   );
-};
-
-CategoryModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-  selectedCategory: PropTypes.object,
 };
 
 export default CategoryModal;
