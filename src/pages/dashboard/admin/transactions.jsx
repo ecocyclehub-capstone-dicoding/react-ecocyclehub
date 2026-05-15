@@ -40,7 +40,9 @@ const AdminTransactionsPage = () => {
     <DashboardLayout sidebar={adminSidebar}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#0d4f2c]">Transactions</h1>
+          <h1 className="text-3xl font-bold text-[#0d4f2c]">
+            Transactions Management
+          </h1>
 
           <p className="text-gray-500 mt-2">
             Manage and verify waste transactions.
