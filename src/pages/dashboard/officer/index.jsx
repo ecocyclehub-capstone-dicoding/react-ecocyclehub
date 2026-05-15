@@ -66,7 +66,7 @@ const OfficerDashboardPage = () => {
       title="Officer Dashboard"
       subtitle="Monitor waste operations"
     >
-      <div className="grid grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <StatCard title="Collections" value="248" icon="🚛" />
 
         <StatCard title="Waste Volume" value="3.2T" icon="♻️" />
@@ -76,7 +76,7 @@ const OfficerDashboardPage = () => {
         <StatCard title="Performance" value="98%" icon="📈" dark />
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cold-3 gap-6">
         <SectionWrapper title="Recent Collections">
           <TransactionList items={transactions} />
         </SectionWrapper>

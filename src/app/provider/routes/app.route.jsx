@@ -11,9 +11,7 @@ const AdminDashboardPage = lazy(() => import("@/pages/dashboard/admin"));
 const OfficerDashboardPage = lazy(() => import("@/pages/dashboard/officer"));
 const CustomerDashboardPage = lazy(() => import("@/pages/dashboard/customer"));
 
-const AdminCustomersPage = lazy(
-  () => import("@/pages/dashboard/admin/customers"),
-);
+const AdminUsersPage = lazy(() => import("@/pages/dashboard/admin/users"));
 
 const AdminTransactionsPage = lazy(
   () => import("@/pages/dashboard/admin/transactions"),
@@ -77,8 +75,8 @@ export const router = createBrowserRouter([
       },
 
       {
-        path: "customers",
-        element: wrap(AdminCustomersPage),
+        path: "users",
+        element: wrap(AdminUsersPage),
       },
       {
         path: "transactions",

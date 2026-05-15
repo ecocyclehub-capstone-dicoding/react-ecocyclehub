@@ -30,7 +30,7 @@ const AdminDashboardPage = () => {
       title="Admin Dashboard"
       subtitle="Operational Overview"
     >
-      <div className="grid grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <StatCard title="Total Customers" value="1,245" icon="👥" />
 
         <StatCard title="Transactions" value="328" icon="📄" />

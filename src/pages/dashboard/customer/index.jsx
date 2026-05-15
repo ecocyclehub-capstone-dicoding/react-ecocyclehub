@@ -32,7 +32,7 @@ const CustomerDashboardPage = () => {
       title="Customer Dashboard"
       subtitle="Track your eco contribution"
     >
-      <div className="grid grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <ProgressCard level="Gold Member" current={820} total={1000} />
 
         <RewardCard
