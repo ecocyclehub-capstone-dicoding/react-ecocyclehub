@@ -4,18 +4,23 @@ export const ROLE_DASHBOARD_PATHS = {
   customer: "/customer/dashboard",
 };
 
+const VALID_ROLES = ["admin", "officer", "customer"];
+
 export const normalizeRole = (role) => {
   if (!role) return null;
 
-  if (typeof role === "string") return role.toLowerCase();
+  const normalized =
+    typeof role === "string"
+      ? role.toLowerCase()
+      : (role.key || role.name || role.slug || "").toLowerCase();
 
-  return (role.key || role.name || role.slug || "").toLowerCase() || null;
+  return VALID_ROLES.includes(normalized) ? normalized : null;
 };
 
 export const getDashboardPathByRole = (role) => {
   const normalizedRole = normalizeRole(role);
 
-  return ROLE_DASHBOARD_PATHS[normalizedRole] || ROLE_DASHBOARD_PATHS.customer;
+  return normalizedRole ? ROLE_DASHBOARD_PATHS[normalizedRole] : null;
 };
 
 export const getRoleFromLoginResponse = (response) => {

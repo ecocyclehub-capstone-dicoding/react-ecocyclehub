@@ -21,11 +21,16 @@ export const useAuth = () => {
       const res = await authApi.login(data);
 
       const { access_token, refresh_token } = res.data;
-      const role = getRoleFromLoginResponse(res) || "customer";
+      const role = getRoleFromLoginResponse(res);
+      if (!role) {
+        throw new Error("Invalid role received from server");
+      }
       const loggedInUser = {
         ...(res.data?.user || {}),
         role: {
-          ...(typeof res.data?.user?.role === "object" ? res.data.user.role : {}),
+          ...(typeof res.data?.user?.role === "object"
+            ? res.data.user.role
+            : {}),
           key: role,
         },
       };

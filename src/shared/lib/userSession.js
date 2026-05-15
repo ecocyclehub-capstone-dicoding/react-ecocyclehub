@@ -3,25 +3,36 @@ const USER_ROLE = "ecocycle_user_role";
 
 export const userSession = {
   getUser: () => {
-    const user = localStorage.getItem(USER_SESSION);
-    const role = localStorage.getItem(USER_ROLE);
-
-    if (!user) return role ? { role: { key: role } } : null;
-
     try {
+      const user = localStorage.getItem(USER_SESSION);
+
+      if (!user) return null;
+
       return JSON.parse(user);
-    } catch {
-      return role ? { role: { key: role } } : null;
+    } catch (err) {
+      return null;
     }
   },
 
+  getRole: () => {
+    return localStorage.getItem(USER_ROLE);
+  },
+
   setUser: (user, role) => {
-    if (user) localStorage.setItem(USER_SESSION, JSON.stringify(user));
-    if (role) localStorage.setItem(USER_ROLE, role);
+    try {
+      if (user) localStorage.setItem(USER_SESSION, JSON.stringify(user));
+      if (role) localStorage.setItem(USER_ROLE, role);
+    } catch (err) {
+      console.error("Failed to persist user session:", err);
+    }
   },
 
   clearUser: () => {
-    localStorage.removeItem(USER_SESSION);
-    localStorage.removeItem(USER_ROLE);
+    try {
+      localStorage.removeItem(USER_SESSION);
+      localStorage.removeItem(USER_ROLE);
+    } catch (err) {
+      console.error("Failed to clear user session:", err);
+    }
   },
 };
