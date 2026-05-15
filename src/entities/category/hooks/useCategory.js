@@ -10,6 +10,7 @@ export const useCategory = () => {
 
   const getCategories = async () => {
     try {
+      setError(null);
       setIsFetching(true);
 
       const res = await categoryApi.getCategories();
