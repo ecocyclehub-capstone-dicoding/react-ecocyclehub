@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { authApi } from "../api/auth.api";
-import { getRoleFromLoginResponse } from "../lib/roleRedirect";
 import { tokenService } from "@/shared/lib/tokenService";
 import { userSession } from "@/shared/lib/userSession";
+import {
+  getDashboardPathByRole,
+  getRoleFromLoginResponse,
+} from "@/entities/auth/lib/roleRedirect";
 
 export const useAuth = () => {
   const [user, setUser] = useState(() => userSession.getUser());
@@ -26,6 +29,12 @@ export const useAuth = () => {
         throw new Error("Invalid role received from server");
       }
 
+      const dashboardPath = getDashboardPathByRole(role);
+
+      if (!dashboardPath) {
+        throw new Error("Invalid dashboard path");
+      }
+
       const { access_token, refresh_token } = res.data;
 
       const loggedInUser = {
@@ -38,19 +47,23 @@ export const useAuth = () => {
         },
       };
 
-      tokenService.setTokens(access_token, refresh_token);
-
       const success = userSession.setUser(loggedInUser, role);
 
       if (!success) {
         throw new Error("Failed to persist user session");
       }
 
+      tokenService.setTokens(access_token, refresh_token);
+
       setUser(loggedInUser);
 
       setMessage(res.message);
 
-      return res;
+      return {
+        ...res,
+        role,
+        dashboardPath,
+      };
     } catch (err) {
       const errorData = err.response?.data;
 

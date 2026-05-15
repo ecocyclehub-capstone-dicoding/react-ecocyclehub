@@ -4,10 +4,6 @@ import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";
 import LoginForm from "@/features/auth/components/LoginForm";
 import { useAuth } from "@/entities/auth/hooks/useAuth";
-import {
-  getDashboardPathByRole,
-  getRoleFromLoginResponse,
-} from "@/entities/auth/lib/roleRedirect";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -16,12 +12,10 @@ const LoginPage = () => {
 
   const handleLogin = async (data) => {
     try {
-      const res = await login(data);
-      const role = getRoleFromLoginResponse(res);
-      const dashboardPath = getDashboardPathByRole(role);
+      const { dashboardPath } = await login(data);
 
       if (!dashboardPath) {
-        throw new Error("Invalid role received from server");
+        throw new Error("Invalid dashboard path");
       }
 
       navigate(dashboardPath, {
@@ -29,8 +23,6 @@ const LoginPage = () => {
       });
     } catch (err) {
       console.error("Login failed:", err);
-
-      return;
     }
   };
 
