@@ -1,5 +1,6 @@
 const ProgressCard = ({ level, current, total }) => {
-  const percentage = (current / total) * 100;
+  const percentage =
+    total > 0 ? Math.min(100, Math.max(0, (current / total) * 100)) : 0;
 
   return (
     <div className="bg-[#e4e2ae] rounded-3xl p-8">

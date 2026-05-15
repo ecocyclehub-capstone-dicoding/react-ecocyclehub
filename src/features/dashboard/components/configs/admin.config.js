@@ -29,9 +29,9 @@ export const adminSidebar = {
       path: "/admin/transactions",
     },
     {
-      label: "Customers",
+      label: "Users",
       icon: MdPeople,
-      path: "/admin/customers",
+      path: "/admin/users",
     },
     {
       label: "Categories",

@@ -10,12 +10,20 @@ const Topbar = ({ title, subtitle }) => {
       </div>
 
       <div className="flex gap-4">
-        <button className="w-14 h-14 rounded-full bg-[#ddd8a9] flex items-center justify-center">
-          <FiSearch />
+        <button
+          type="button"
+          aria-label="Search"
+          className="w-14 h-14 rounded-full bg-[`#ddd8a9`] flex items-center justify-center"
+        >
+          <FiSearch aria-hidden="true" />
         </button>
 
-        <button className="w-14 h-14 rounded-full bg-[#ddd8a9] flex items-center justify-center">
-          <FiBell />
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="w-14 h-14 rounded-full bg-[`#ddd8a9`] flex items-center justify-center"
+        >
+          <FiBell aria-hidden="true" />
         </button>
       </div>
     </div>

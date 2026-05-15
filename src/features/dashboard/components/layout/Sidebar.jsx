@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
 
-const Sidebar = ({ sidebar }) => {
+const Sidebar = ({ sidebar, onFooterButtonClick }) => {
   return (
     <aside className="w-[250px] bg-[#d9d4aa] min-h-screen flex flex-col justify-between">
       <div>
@@ -56,7 +56,11 @@ const Sidebar = ({ sidebar }) => {
 
       {/* BUTTON */}
       <div className="p-6">
-        <button className="w-full bg-[#1f6a32] text-white py-4 rounded-2xl font-semibold hover:opacity-90 transition">
+        <button
+          type="button"
+          onClick={onFooterButtonClick}
+          className="w-full bg-[`#1f6a32`] text-white py-4 rounded-2xl font-semibold hover:opacity-90 transition"
+        >
           {sidebar.buttonText}
         </button>
       </div>
@@ -65,6 +69,7 @@ const Sidebar = ({ sidebar }) => {
 };
 
 Sidebar.propTypes = {
+  onFooterButtonClick: PropTypes.func,
   sidebar: PropTypes.shape({
     brand: PropTypes.string.isRequired,
 
