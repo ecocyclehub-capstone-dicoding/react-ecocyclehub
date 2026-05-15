@@ -70,6 +70,10 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute allowedRoles={["admin"]} />,
     children: [
       {
+        index: true,
+        element: <Navigate to="dashboard" replace />,
+      },
+      {
         path: "dashboard",
         element: wrap(AdminDashboardPage),
       },
@@ -101,6 +105,10 @@ export const router = createBrowserRouter([
 
     children: [
       {
+        index: true,
+        element: <Navigate to="dashboard" replace />,
+      },
+      {
         path: "dashboard",
         element: wrap(OfficerDashboardPage),
       },
@@ -118,6 +126,10 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute allowedRoles={["customer"]} />,
 
     children: [
+      {
+        index: true,
+        element: <Navigate to="dashboard" replace />,
+      },
       {
         path: "dashboard",
         element: wrap(CustomerDashboardPage),
