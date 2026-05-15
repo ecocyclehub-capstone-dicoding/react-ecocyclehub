@@ -13,7 +13,7 @@ export const transactionApi = {
 
   verify: async (transactionId) => {
     const res = await axiosInstance.post(
-      `/transaction/${transactionId}/verify`,
+      `/transactions/${transactionId}/verify`,
     );
 
     return res.data;

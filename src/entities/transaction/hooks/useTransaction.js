@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { transactionApi } from "../api/transaction.api";
 
 export const useTransaction = () => {
@@ -10,7 +10,7 @@ export const useTransaction = () => {
 
   const [fieldErrors, setFieldErrors] = useState({});
 
-  const getTransactions = async () => {
+  const getTransactions = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -22,7 +22,7 @@ export const useTransaction = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const createTransaction = async (payload) => {
     try {
@@ -31,6 +31,8 @@ export const useTransaction = () => {
       setFieldErrors({});
 
       const res = await transactionApi.create(payload);
+
+      await getTransactions();
 
       return res;
     } catch (err) {

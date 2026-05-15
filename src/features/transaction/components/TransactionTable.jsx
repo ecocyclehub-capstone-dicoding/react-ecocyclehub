@@ -16,9 +16,9 @@ const TransactionTable = ({ data, onVerify }) => {
         </thead>
 
         <tbody>
-          {data.map((item) => (
+          {data?.map((item) => (
             <tr key={item.id} className="border-t border-gray-100">
-              <td className="p-5">{item.id.slice(0, 8)}</td>
+              <td className="p-5">{String(item.id).slice(0, 8)}</td>
 
               <td className="p-5">{item.total_weight} kg</td>
 
