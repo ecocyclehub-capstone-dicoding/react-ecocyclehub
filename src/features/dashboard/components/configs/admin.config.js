@@ -9,12 +9,6 @@ import {
 export const adminSidebar = {
   brand: "EcoCycle Hub",
 
-  profile: {
-    name: "Admin Dashboard",
-    role: "Manager",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-
   buttonText: "Generate Report",
 
   menus: [

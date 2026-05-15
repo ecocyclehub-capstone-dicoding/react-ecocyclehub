@@ -11,18 +11,14 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
         </div>
 
         {/* PROFILE */}
-        <div className="px-6 flex items-center gap-4 mb-10">
-          <img
-            src={sidebar.profile.avatar}
-            alt={sidebar.profile.name}
-            className="w-14 h-14 rounded-full object-cover"
-          />
+        <div className="px-6 mb-10">
+          <h2 className="font-bold text-lg text-[#0d4f2c]">
+            {sidebar?.email || "User"}
+          </h2>
 
-          <div>
-            <h2 className="font-bold">{sidebar.profile.name}</h2>
-
-            <p className="text-sm text-gray-600">{sidebar.profile.role}</p>
-          </div>
+          <p className="text-sm text-gray-600 capitalize">
+            {sidebar?.role?.name || sidebar?.role?.key || "Member"}
+          </p>
         </div>
 
         {/* MENUS */}
@@ -59,7 +55,7 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
         <button
           type="button"
           onClick={onFooterButtonClick}
-          className="w-full bg-[`#1f6a32`] text-white py-4 rounded-2xl font-semibold hover:opacity-90 transition"
+          className="w-full bg-[#1f6a32] text-white py-4 rounded-2xl font-semibold hover:opacity-90 transition"
         >
           {sidebar.buttonText}
         </button>
@@ -70,14 +66,14 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
 
 Sidebar.propTypes = {
   onFooterButtonClick: PropTypes.func,
+
   sidebar: PropTypes.shape({
     brand: PropTypes.string.isRequired,
 
     profile: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      role: PropTypes.string.isRequired,
-      avatar: PropTypes.string.isRequired,
-    }).isRequired,
+      name: PropTypes.string,
+      role: PropTypes.string,
+    }),
 
     menus: PropTypes.arrayOf(
       PropTypes.shape({
