@@ -6,8 +6,13 @@ export const userApi = {
     return res.data;
   },
 
-  updateUser: async (id, data) => {
-    const res = await axiosInstance.put(`/users/${id}/`, data);
+  createUser: async (payload) => {
+    const res = await axiosInstance.post("/users/", payload);
+    return res.data;
+  },
+
+  updateUser: async (id, payload) => {
+    const res = await axiosInstance.put(`/users/${id}/`, payload);
     return res.data;
   },
 

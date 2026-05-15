@@ -22,27 +22,23 @@ const UserTable = ({ users, onEdit, onDelete }) => {
               <td className="p-5">{user.email}</td>
 
               <td className="p-5">
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                  {user.role}
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                  {user.role?.name}
                 </span>
               </td>
 
               <td className="p-5">
                 <div className="flex items-center gap-3">
                   <button
-                    type="button"
-                    aria-label={`Edit ${user.name}`}
                     onClick={() => onEdit(user)}
-                    className="bg-yellow-100 text-yellow-700 p-2 rounded-xl"
+                    className="rounded-xl bg-yellow-100 p-2 text-yellow-700"
                   >
                     <MdEdit size={18} />
                   </button>
 
                   <button
-                    type="button"
-                    aria-label={`Delete ${user.name}`}
                     onClick={() => onDelete(user)}
-                    className="bg-red-100 text-red-700 p-2 rounded-xl"
+                    className="rounded-xl bg-red-100 p-2 text-red-700"
                   >
                     <MdDelete size={18} />
                   </button>
