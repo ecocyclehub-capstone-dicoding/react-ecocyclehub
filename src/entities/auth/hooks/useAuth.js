@@ -13,23 +13,16 @@ import {
 
 export const useAuth = () => {
   const [user, setUser] = useState(() => userSession.getUser());
-
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState(null);
-
   const [fieldErrors, setFieldErrors] = useState({});
-
   const [message, setMessage] = useState(null);
 
   const login = async (data) => {
     try {
       setLoading(true);
-
       setError(null);
-
       setFieldErrors({});
-
       setMessage(null);
 
       const res = await authApi.login(data);
@@ -46,16 +39,22 @@ export const useAuth = () => {
         throw new Error("Invalid dashboard path");
       }
 
-      const { access_token, refresh_token } = res.data;
+      const {
+        access_token,
+        refresh_token,
+        id,
+        name,
+        email,
+        role: roleData,
+      } = res.data;
 
       const loggedInUser = {
-        ...(res.data?.user || {}),
+        id,
+        name,
+        email,
 
         role: {
-          ...(typeof res.data?.user?.role === "object"
-            ? res.data.user.role
-            : {}),
-
+          ...(typeof roleData === "object" ? roleData : {}),
           key: role,
         },
       };
