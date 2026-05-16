@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";
 import RegisterForm from "@/features/auth/components/RegisterForm";
-import { useAuth } from "@/entities/auth/hooks/useAuth";
+import { useAuthContext } from "@/app/provider/AuthProvider";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
 
-  const { register, loading, error, fieldErrors, message } = useAuth();
+  const { register, loading, error, fieldErrors, message } = useAuthContext();
 
   const handleRegister = async (data) => {
     try {

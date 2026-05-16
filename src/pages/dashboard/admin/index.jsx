@@ -12,17 +12,16 @@ import { buildSidebar } from "@/features/dashboard/lib/buildSidebar";
 
 import { useAdminDashboard } from "@/entities/dashboard/hooks/useAdminDashboard";
 
-import { useAuth } from "@/entities/auth/hooks/useAuth";
-
 import {
   HiUsers,
   HiDocumentText,
   HiArrowPath,
   HiCurrencyDollar,
 } from "react-icons/hi2";
+import { useAuthContext } from "@/app/provider/AuthProvider";
 
 const AdminDashboardPage = () => {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
 
   const sidebar = buildSidebar(adminSidebar, user);
 

@@ -4,13 +4,13 @@ import { adminSidebar } from "@/features/dashboard/components/configs/admin.conf
 import TransactionTable from "@/features/transaction/components/TransactionTable";
 import Pagination from "@/shared/components/Pagination";
 import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
-import { useAuth } from "@/entities/auth/hooks/useAuth";
 import { buildSidebar } from "@/features/dashboard/lib/buildSidebar";
+import { useAuthContext } from "@/app/provider/AuthProvider";
 
 const PAGE_SIZE = 6;
 
 const AdminTransactionsPage = () => {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const { transactions, loading, error, verifyTransaction } = useTransaction();
   const [page, setPage] = useState(1);
   const sidebar = buildSidebar(adminSidebar, user);

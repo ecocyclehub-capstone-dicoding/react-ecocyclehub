@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/entities/auth/hooks/useAuth";
 import { FiLogOut } from "react-icons/fi";
+import { useAuthContext } from "@/app/provider/AuthProvider";
 
 const Sidebar = ({ sidebar, onFooterButtonClick }) => {
-  const { logout } = useAuth();
+  const { logout } = useAuthContext();
   const navigate = useNavigate();
 
   const handleLogout = async () => {

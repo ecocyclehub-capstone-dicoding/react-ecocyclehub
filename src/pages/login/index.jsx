@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";
 import LoginForm from "@/features/auth/components/LoginForm";
-import { useAuth } from "@/entities/auth/hooks/useAuth";
+import { useAuthContext } from "@/app/provider/AuthProvider";
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  const { login, loading, error, fieldErrors } = useAuth();
+  const { login, loading, error, fieldErrors } = useAuthContext();
 
   const handleLogin = async (data) => {
     try {

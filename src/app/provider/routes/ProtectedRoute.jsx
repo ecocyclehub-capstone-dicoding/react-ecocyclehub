@@ -1,7 +1,11 @@
 import React from "react";
+
 import { MdRecycling } from "react-icons/md";
+
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "@/entities/auth/hooks/useAuth";
+
+import { useAuthContext } from "@/app/provider/AuthProvider";
+
 import {
   getDashboardPathByRole,
   normalizeRole,
@@ -24,7 +28,7 @@ const Spinner = () => (
 );
 
 const ProtectedRoute = ({ allowedRoles }) => {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuthContext();
 
   if (isLoading) return <Spinner />;
 
@@ -32,7 +36,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  const role = normalizeRole(user?.role);
+  const role = normalizeRole(user?.role?.key ?? user?.role);
 
   if (!role) {
     return <Navigate to="/login" replace />;
@@ -41,11 +45,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   if (allowedRoles?.length && !allowedRoles.includes(role)) {
     const dashboardPath = getDashboardPathByRole(role);
 
-    if (!dashboardPath) {
-      return <Navigate to="/login" replace />;
-    }
-
-    return <Navigate to={dashboardPath} replace />;
+    return <Navigate to={dashboardPath || "/login"} replace />;
   }
 
   return <Outlet />;
