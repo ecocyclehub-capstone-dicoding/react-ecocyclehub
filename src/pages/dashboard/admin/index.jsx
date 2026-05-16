@@ -26,7 +26,7 @@ const AdminDashboardPage = () => {
 
   const sidebar = buildSidebar(adminSidebar, user);
 
-  const { stats, transactions, loading, error } = useAdminDashboard();
+  const { stats, recentTransactions, loading, error } = useAdminDashboard();
 
   if (loading) {
     return (
@@ -70,7 +70,7 @@ const AdminDashboardPage = () => {
 
         <StatCard
           title="Waste Volume"
-          value={`${stats?.totalWeight || 0} kg`}
+          value={`${stats?.totalWaste || 0} kg`}
           icon={<HiArrowPath size={24} />}
         />
 
@@ -84,7 +84,7 @@ const AdminDashboardPage = () => {
 
       {/* RECENT TRANSACTIONS */}
       <SectionWrapper title="Recent Transactions" action="View All">
-        <RecentTransactionTable items={transactions} />
+        <RecentTransactionTable items={recentTransactions} />
       </SectionWrapper>
     </DashboardLayout>
   );
