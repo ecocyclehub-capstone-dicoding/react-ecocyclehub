@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { userApi } from "../api/user.api";
 
 export const useUser = () => {
@@ -10,19 +10,20 @@ export const useUser = () => {
 
   const [error, setError] = useState(null);
 
-  const getUsers = async () => {
+  const getUsers = useCallback(async () => {
     try {
       setIsFetching(true);
 
       const res = await userApi.getUsers();
 
       setUsers(res.data || []);
+      setError(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch users");
     } finally {
       setIsFetching(false);
     }
-  };
+  }, []);
 
   const createUser = async (payload) => {
     try {
@@ -33,6 +34,9 @@ export const useUser = () => {
       setUsers((prev) => [res.data, ...prev]);
 
       return res;
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create user");
+      throw err;
     } finally {
       setIsMutating(false);
     }
@@ -49,6 +53,9 @@ export const useUser = () => {
       );
 
       return res;
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update user");
+      throw err;
     } finally {
       setIsMutating(false);
     }
@@ -61,6 +68,9 @@ export const useUser = () => {
       await userApi.deleteUser(id);
 
       setUsers((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete user");
+      throw err;
     } finally {
       setIsMutating(false);
     }
