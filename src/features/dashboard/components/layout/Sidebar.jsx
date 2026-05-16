@@ -13,11 +13,11 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
         {/* PROFILE */}
         <div className="px-6 mb-10">
           <h2 className="font-bold text-lg text-[#0d4f2c]">
-            {sidebar?.email || "User"}
+            {sidebar?.profile?.name || "User"}
           </h2>
 
           <p className="text-sm text-gray-600 capitalize">
-            {sidebar?.role?.name || sidebar?.role?.key || "Member"}
+            {sidebar?.profile?.role || "Member"}
           </p>
         </div>
 
