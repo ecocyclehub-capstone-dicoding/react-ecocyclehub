@@ -32,10 +32,5 @@ export const adminSidebar = {
       icon: MdCategory,
       path: "/admin/categories",
     },
-    {
-      label: "Reports",
-      icon: MdAssessment,
-      path: "/admin/reports",
-    },
   ],
 };
