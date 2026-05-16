@@ -1,7 +1,18 @@
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/entities/auth/hooks/useAuth";
+import { FiLogOut } from "react-icons/fi";
 
 const Sidebar = ({ sidebar, onFooterButtonClick }) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <aside className="w-[250px] bg-[#d9d4aa] min-h-screen flex flex-col justify-between">
       <div>
@@ -54,10 +65,11 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
       <div className="p-6">
         <button
           type="button"
-          onClick={onFooterButtonClick}
-          className="w-full bg-[#1f6a32] text-white py-4 rounded-2xl font-semibold hover:opacity-90 transition"
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-4 rounded-2xl font-semibold hover:bg-red-700 transition"
         >
-          {sidebar.buttonText}
+          <FiLogOut size={18} />
+          Logout
         </button>
       </div>
     </aside>

@@ -113,9 +113,26 @@ export const useAuth = () => {
     }
   };
 
+  const logout = async () => {
+    try {
+      const refresh = tokenService.getRefreshToken();
+
+      if (refresh) {
+        await authApi.logout(refresh);
+      }
+    } catch (err) {
+      console.warn("Logout API failed, forcing local logout");
+    } finally {
+      tokenService.clearTokens();
+      userSession.clearUser();
+      setUser(null);
+    }
+  };
+
   return {
     login,
     register,
+    logout,
     user,
     isAuthenticated: Boolean(tokenService.getAccessToken()),
     isLoading: loading,

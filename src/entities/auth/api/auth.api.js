@@ -25,8 +25,11 @@ export const authApi = {
     return res.data.data;
   },
 
-  logout: async () => {
-    const res = await axiosInstance.post("/auth/logout/");
+  logout: async (refresh) => {
+    const res = await axiosInstance.post("/auth/logout/", {
+      refresh,
+    });
+
     return res.data;
   },
 };
