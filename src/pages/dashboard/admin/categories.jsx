@@ -86,7 +86,7 @@ const AdminCategoriesPage = () => {
     <DashboardLayout sidebar={adminSidebar}>
       <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex justify-between">
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[#0d4f2c]">
               Categories Management
