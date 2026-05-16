@@ -26,7 +26,7 @@ const AdminDashboardPage = () => {
 
   const sidebar = buildSidebar(adminSidebar, user);
 
-  const { stats, recentTransactions, loading, error } = useAdminDashboard();
+  const { data, loading, error } = useAdminDashboard();
 
   if (loading) {
     return (
@@ -57,35 +57,29 @@ const AdminDashboardPage = () => {
       {/* STATS */}
       <div className="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          title="Total Customers"
-          value={stats?.totalCustomers || 0}
+          title="Total Users"
+          value={data?.total_users || 0}
           icon={<HiUsers size={24} />}
         />
 
         <StatCard
           title="Transactions"
-          value={stats?.totalTransactions || 0}
+          value={data?.total_transactions || 0}
           icon={<HiDocumentText size={24} />}
         />
 
         <StatCard
           title="Waste Volume"
-          value={`${stats?.totalWaste || 0} kg`}
+          value={`${data?.total_weight || 0} kg`}
           icon={<HiArrowPath size={24} />}
         />
 
         <StatCard
           title="Revenue"
-          value={`Rp ${stats?.totalRevenue || 0}`}
+          value={`Rp ${data?.total_balance || 0}`}
           icon={<HiCurrencyDollar size={24} />}
-          dark
         />
       </div>
-
-      {/* RECENT TRANSACTIONS */}
-      <SectionWrapper title="Recent Transactions" action="View All">
-        <RecentTransactionTable items={recentTransactions} />
-      </SectionWrapper>
     </DashboardLayout>
   );
 };
