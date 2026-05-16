@@ -12,14 +12,14 @@ const SuccessModal = ({ open, title, message, onClose }) => {
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [open, onclose]);
+  }, [open, onClose]);
 
   if (!open) return null;
 
   return (
     <div
       className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
-      onClick={onclose}
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="success-title"

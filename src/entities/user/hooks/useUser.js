@@ -27,6 +27,7 @@ export const useUser = () => {
 
   const createUser = async (payload) => {
     try {
+      setError(null);
       setIsMutating(true);
 
       const res = await userApi.createUser(payload);
@@ -44,6 +45,7 @@ export const useUser = () => {
 
   const updateUser = async (id, payload) => {
     try {
+      setError(null);
       setIsMutating(true);
 
       const res = await userApi.updateUser(id, payload);
@@ -63,6 +65,7 @@ export const useUser = () => {
 
   const deleteUser = async (id) => {
     try {
+      setError(null);
       setIsMutating(true);
 
       await userApi.deleteUser(id);

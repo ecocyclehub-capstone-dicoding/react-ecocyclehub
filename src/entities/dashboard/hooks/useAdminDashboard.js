@@ -22,26 +22,11 @@ export const useAdminDashboard = () => {
       .finally(() => setLoading(false));
   }, [getUsers, getTransactions]);
 
-  // useEffect(() => {
-  //   const fetchDashboard = async () => {
-  //     try {
-  //       setLoading(true);
-  //       setError(null);
-
-  //       Promise.all([getUsers(), getTransactions()]);
-  //     } catch (err) {
-  //       setError(err.message || "Failed to load dashboard");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchDashboard();
-  // }, [getUsers, getTransactions]);
-
   useEffect(() => {
-    const totalCustomers = users.filter(
-      (user) => user.role?.key === "customer",
-    ).length;
+    const totalCustomers = users.filter((user) => {
+      const role = typeof user.role === "string" ? user.role : user.role?.key;
+      return role?.toLowerCase() === "customer";
+    }).length;
 
     const totalTransactions = transactions.length;
 
