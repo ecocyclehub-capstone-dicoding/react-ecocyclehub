@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useUser } from "@/entities/user/hooks/useUser";
 import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
 
 export const useAdminDashboard = () => {
   const { users, getUsers } = useUser();
-
   const { transactions, getTransactions } = useTransaction();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [stats, setStats] = useState({
     totalCustomers: 0,
@@ -16,9 +17,26 @@ export const useAdminDashboard = () => {
   });
 
   useEffect(() => {
-    getUsers();
-    getTransactions();
-  }, []);
+    Promise.all([getUsers(), getTransactions()])
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [getUsers, getTransactions]);
+
+  // useEffect(() => {
+  //   const fetchDashboard = async () => {
+  //     try {
+  //       setLoading(true);
+  //       setError(null);
+
+  //       Promise.all([getUsers(), getTransactions()]);
+  //     } catch (err) {
+  //       setError(err.message || "Failed to load dashboard");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchDashboard();
+  // }, [getUsers, getTransactions]);
 
   useEffect(() => {
     const totalCustomers = users.filter(
@@ -45,12 +63,18 @@ export const useAdminDashboard = () => {
     });
   }, [users, transactions]);
 
-  const recentTransactions = [...transactions]
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(0, 5);
+  const recentTransactions = useMemo(
+    () =>
+      [...transactions]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5),
+    [transactions],
+  );
 
   return {
     stats,
     recentTransactions,
+    loading,
+    error,
   };
 };
