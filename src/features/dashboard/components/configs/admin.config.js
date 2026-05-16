@@ -9,7 +9,7 @@ import {
 export const adminSidebar = {
   brand: "EcoCycle Hub",
 
-  buttonText: "Generate Report",
+  buttonText: "Logout",
 
   menus: [
     {

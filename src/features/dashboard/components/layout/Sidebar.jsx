@@ -65,11 +65,11 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
       <div className="p-6">
         <button
           type="button"
-          onClick={handleLogout}
+          onClick={onFooterButtonClick || handleLogout}
           className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-4 rounded-2xl font-semibold hover:bg-red-700 transition"
         >
           <FiLogOut size={18} />
-          Logout
+          {sidebar.buttonText || "Logout"}
         </button>
       </div>
     </aside>

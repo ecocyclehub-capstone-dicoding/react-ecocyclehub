@@ -8,14 +8,8 @@ import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
 const PAGE_SIZE = 6;
 
 const AdminTransactionsPage = () => {
-  const { transactions, loading, error, getTransactions, verifyTransaction } =
-    useTransaction();
-
+  const { transactions, loading, error, verifyTransaction } = useTransaction();
   const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    getTransactions();
-  }, [getTransactions]);
 
   const totalPages = Math.ceil(transactions.length / PAGE_SIZE);
 
