@@ -10,7 +10,10 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login", { replace: true });
+
+    navigate("/login", {
+      replace: true,
+    });
   };
 
   return (

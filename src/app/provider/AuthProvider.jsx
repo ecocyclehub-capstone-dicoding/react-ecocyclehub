@@ -1,12 +1,19 @@
 import { createContext, useContext } from "react";
-import { useAuth } from "../hooks/useAuth";
+
+import { useAuth } from "@/entities/auth/hooks/useAuth";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const auth = useAuth();
 
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+  const value = {
+    ...auth,
+
+    isAuthenticated: Boolean(auth.user),
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuthContext = () => {

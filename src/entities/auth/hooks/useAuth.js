@@ -1,7 +1,11 @@
 import { useState } from "react";
+
 import { authApi } from "../api/auth.api";
+
 import { tokenService } from "@/shared/lib/tokenService";
+
 import { userSession } from "@/shared/lib/userSession";
+
 import {
   getDashboardPathByRole,
   getRoleFromLoginResponse,
@@ -9,16 +13,23 @@ import {
 
 export const useAuth = () => {
   const [user, setUser] = useState(() => userSession.getUser());
+
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState(null);
+
   const [fieldErrors, setFieldErrors] = useState({});
+
   const [message, setMessage] = useState(null);
 
   const login = async (data) => {
     try {
       setLoading(true);
+
       setError(null);
+
       setFieldErrors({});
+
       setMessage(null);
 
       const res = await authApi.login(data);
@@ -39,10 +50,12 @@ export const useAuth = () => {
 
       const loggedInUser = {
         ...(res.data?.user || {}),
+
         role: {
           ...(typeof res.data?.user?.role === "object"
             ? res.data.user.role
             : {}),
+
           key: role,
         },
       };
@@ -70,9 +83,11 @@ export const useAuth = () => {
       if (errorData?.errors) {
         if (errorData.errors.non_field_errors) {
           setError(errorData.errors.non_field_errors[0]);
+
           setFieldErrors({});
         } else {
           setFieldErrors(errorData.errors);
+
           setError(null);
         }
       } else {
@@ -88,8 +103,11 @@ export const useAuth = () => {
   const register = async (data) => {
     try {
       setLoading(true);
+
       setError(null);
+
       setFieldErrors({});
+
       setMessage(null);
 
       const res = await authApi.register(data);
@@ -102,6 +120,7 @@ export const useAuth = () => {
 
       if (res?.errors) {
         setFieldErrors(res.errors);
+
         setError(null);
       } else {
         setError(res?.message || "Registrasi gagal");
@@ -124,7 +143,9 @@ export const useAuth = () => {
       console.warn("Logout API failed, forcing local logout");
     } finally {
       tokenService.clearTokens();
+
       userSession.clearUser();
+
       setUser(null);
     }
   };
@@ -134,7 +155,7 @@ export const useAuth = () => {
     register,
     logout,
     user,
-    isAuthenticated: Boolean(tokenService.getAccessToken()),
+    isAuthenticated: !!user,
     isLoading: loading,
     loading,
     error,
