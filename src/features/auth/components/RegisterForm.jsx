@@ -19,9 +19,7 @@ const RegisterForm = ({ onSubmit, loading, error, fieldErrors }) => {
       [name]: value,
     }));
 
-    if (fieldErrors?.[name]) {
-      fieldErrors[name] = null;
-    }
+    setLocalError(null);
   };
 
   const handleSubmit = (e) => {

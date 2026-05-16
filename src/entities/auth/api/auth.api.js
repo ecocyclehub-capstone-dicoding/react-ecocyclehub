@@ -25,8 +25,15 @@ export const authApi = {
     return res.data.data;
   },
 
-  logout: async () => {
-    const res = await axiosInstance.post("/auth/logout/");
+  logout: async (refresh) => {
+    if (!refresh) {
+      throw new Error("Missing refresh token for logout");
+    }
+
+    const res = await axiosInstance.post("/auth/logout/", {
+      refresh,
+    });
+
     return res.data;
   },
 };
