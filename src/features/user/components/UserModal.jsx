@@ -41,6 +41,16 @@ const UserModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.name.trim()) {
+      alert("Full Name is required");
+      return;
+    }
+
+    if (!form.email.trim()) {
+      alert("Full Email is required");
+      return;
+    }
+
     const payload = {
       name: form.name,
       email: form.email,
