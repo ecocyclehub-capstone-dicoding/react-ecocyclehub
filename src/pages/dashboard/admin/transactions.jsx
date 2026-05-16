@@ -1,55 +1,57 @@
-import { useEffect } from "react";
-
+import { useEffect, useState } from "react";
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
-
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
-
 import TransactionTable from "@/features/transaction/components/TransactionTable";
-
+import Pagination from "@/shared/components/Pagination";
 import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
+
+const PAGE_SIZE = 6;
 
 const AdminTransactionsPage = () => {
   const { transactions, loading, error, getTransactions, verifyTransaction } =
     useTransaction();
 
+  const [page, setPage] = useState(1);
+
   useEffect(() => {
     getTransactions();
   }, [getTransactions]);
 
-  if (loading) {
-    return (
-      <DashboardLayout sidebar={adminSidebar}>
-        <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500">Loading transactions...</p>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const totalPages = Math.ceil(transactions.length / PAGE_SIZE);
 
-  if (error) {
-    return (
-      <DashboardLayout sidebar={adminSidebar}>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-700">{error}</p>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const paginatedTransactions = transactions.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE,
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [transactions.length]);
 
   return (
     <DashboardLayout sidebar={adminSidebar}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-[#0d4f2c]">
-            Transactions Management
-          </h1>
+        <h1 className="text-3xl font-bold text-[#0d4f2c]">
+          Transactions Management
+        </h1>
 
-          <p className="text-gray-500 mt-2">
-            Manage and verify waste transactions.
-          </p>
-        </div>
+        {loading && <div>Loading...</div>}
+        {error && <div className="text-red-500">{error}</div>}
 
-        <TransactionTable data={transactions} onVerify={verifyTransaction} />
+        {!loading && !error && (
+          <>
+            <TransactionTable
+              data={paginatedTransactions}
+              onVerify={verifyTransaction}
+            />
+
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+            />
+          </>
+        )}
       </div>
     </DashboardLayout>
   );

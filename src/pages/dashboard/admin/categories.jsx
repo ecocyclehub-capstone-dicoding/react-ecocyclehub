@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
+
 import CategoryTable from "@/features/category/components/CategoryTable";
 import CategoryModal from "@/features/category/components/CategoryModal";
 import CategoryDeleteModal from "@/features/category/components/CategoryDeleteModal";
 import SuccessModal from "@/shared/components/SuccessModal";
+import Pagination from "@/shared/components/Pagination";
+
 import { useCategory } from "@/entities/category/hooks/useCategory";
+
+const PAGE_SIZE = 6;
 
 const AdminCategoriesPage = () => {
   const {
@@ -18,30 +23,27 @@ const AdminCategoriesPage = () => {
     deleteCategory,
   } = useCategory();
 
+  const [page, setPage] = useState(1);
+
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openSuccessModal, setOpenSuccessModal] = useState(false);
+
   const [successMessage, setSuccessMessage] = useState("");
   const [successTitle, setSuccessTitle] = useState("");
+
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const handleCreate = () => {
-    setSelectedCategory(null);
+  const totalPages = Math.ceil(categories.length / PAGE_SIZE);
 
-    setOpenModal(true);
-  };
+  const paginatedCategories = categories.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE,
+  );
 
-  const handleEdit = (category) => {
-    setSelectedCategory(category);
-
-    setOpenModal(true);
-  };
-
-  const handleDeleteClick = (category) => {
-    setSelectedCategory(category);
-
-    setOpenDeleteModal(true);
-  };
+  useEffect(() => {
+    setPage(1);
+  }, [categories.length]);
 
   const handleSubmit = async (payload) => {
     try {
@@ -49,23 +51,19 @@ const AdminCategoriesPage = () => {
 
       if (isEdit) {
         await updateCategory(selectedCategory.id, payload);
-
         setSuccessTitle("Category Updated");
-        setSuccessMessage("The category has been updated successfully.");
+        setSuccessMessage("Category updated successfully");
       } else {
         await createCategory(payload);
-
         setSuccessTitle("Category Created");
-        setSuccessMessage("New category has been added successfully.");
+        setSuccessMessage("Category created successfully");
       }
 
       setOpenModal(false);
       setSelectedCategory(null);
       setOpenSuccessModal(true);
     } catch (err) {
-      const message = err.response?.data?.message || "Failed to save category";
-
-      alert(message);
+      alert(err.response?.data?.message || "Failed to save category");
     }
   };
 
@@ -74,19 +72,13 @@ const AdminCategoriesPage = () => {
       await deleteCategory(id);
 
       setOpenDeleteModal(false);
-
       setSelectedCategory(null);
 
       setSuccessTitle("Category Deleted");
-
-      setSuccessMessage("The category has been deleted successfully.");
-
+      setSuccessMessage("Category deleted successfully");
       setOpenSuccessModal(true);
     } catch (err) {
-      const message =
-        err.response?.data?.message || "Failed to delete category";
-
-      alert(message);
+      alert(err.response?.data?.message || "Failed to delete category");
     }
   };
 
@@ -94,75 +86,75 @@ const AdminCategoriesPage = () => {
     <DashboardLayout sidebar={adminSidebar}>
       <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex items-center justify-between">
+        <div className="flex justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[#0d4f2c]">
               Categories Management
             </h1>
-
             <p className="text-gray-500 mt-2">
               Manage waste categories and pricing.
             </p>
           </div>
 
           <button
-            onClick={handleCreate}
-            className="bg-[#14532d] text-white px-6 py-3 rounded-2xl font-medium"
+            onClick={() => setOpenModal(true)}
+            className="bg-[#14532d] text-white px-6 py-3 rounded-2xl"
           >
             + Add Category
           </button>
         </div>
 
         {/* LOADING */}
-        {isFetching && (
-          <div className="bg-white rounded-3xl p-6 shadow-sm">
-            <p className="text-sm text-gray-500">Loading categories...</p>
-          </div>
-        )}
+        {isFetching && <div>Loading...</div>}
 
         {/* ERROR */}
-        {error && (
-          <div className="bg-white rounded-3xl p-6 shadow-sm">
-            <p className="text-sm text-red-500">{error}</p>
-          </div>
-        )}
+        {error && <div className="text-red-500">{error}</div>}
 
         {/* TABLE */}
         {!isFetching && !error && (
-          <CategoryTable
-            data={categories}
-            onEdit={handleEdit}
-            onDelete={handleDeleteClick}
-          />
+          <>
+            <CategoryTable
+              data={paginatedCategories}
+              onEdit={(c) => {
+                setSelectedCategory(c);
+                setOpenModal(true);
+              }}
+              onDelete={(c) => {
+                setSelectedCategory(c);
+                setOpenDeleteModal(true);
+              }}
+            />
+
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+            />
+          </>
         )}
 
-        {/* CREATE / UPDATE MODAL */}
         <CategoryModal
           open={openModal}
+          selectedCategory={selectedCategory}
+          loading={isMutating}
           onClose={() => {
             setOpenModal(false);
-
             setSelectedCategory(null);
           }}
           onSubmit={handleSubmit}
-          loading={isMutating}
-          selectedCategory={selectedCategory}
         />
 
-        {/* DELETE MODAL */}
         <CategoryDeleteModal
           open={openDeleteModal}
+          category={selectedCategory}
+          loading={isMutating}
           onClose={() => {
             setOpenDeleteModal(false);
-
             setSelectedCategory(null);
           }}
           onConfirm={handleDelete}
-          loading={isMutating}
-          category={selectedCategory}
         />
 
-        {/* SUCCESS MODAL */}
         <SuccessModal
           open={openSuccessModal}
           title={successTitle}
