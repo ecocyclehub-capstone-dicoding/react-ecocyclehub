@@ -4,12 +4,16 @@ import { adminSidebar } from "@/features/dashboard/components/configs/admin.conf
 import TransactionTable from "@/features/transaction/components/TransactionTable";
 import Pagination from "@/shared/components/Pagination";
 import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
+import { useAuth } from "@/entities/auth/hooks/useAuth";
+import { buildSidebar } from "@/features/dashboard/lib/buildSidebar";
 
 const PAGE_SIZE = 6;
 
 const AdminTransactionsPage = () => {
+  const { user } = useAuth();
   const { transactions, loading, error, verifyTransaction } = useTransaction();
   const [page, setPage] = useState(1);
+  const sidebar = buildSidebar(adminSidebar, user);
 
   const totalPages = Math.ceil(transactions.length / PAGE_SIZE);
 
@@ -23,7 +27,7 @@ const AdminTransactionsPage = () => {
   }, [transactions.length]);
 
   return (
-    <DashboardLayout sidebar={adminSidebar}>
+    <DashboardLayout sidebar={sidebar}>
       <div className="space-y-6">
         <h1 className="text-3xl font-bold text-[#0d4f2c]">
           Transactions Management
@@ -34,16 +38,24 @@ const AdminTransactionsPage = () => {
 
         {!loading && !error && (
           <>
-            <TransactionTable
-              data={paginatedTransactions}
-              onVerify={verifyTransaction}
-            />
+            {transactions.length === 0 ? (
+              <div className="text-gray-500 text-center py-8">
+                No transactions found.
+              </div>
+            ) : (
+              <>
+                <TransactionTable
+                  data={paginatedTransactions}
+                  onVerify={verifyTransaction}
+                />
 
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-            />
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                />
+              </>
+            )}
           </>
         )}
       </div>

@@ -34,11 +34,11 @@ const AdminUsersPage = () => {
   const [successTitle, setSuccessTitle] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  useEffect(() => {
-    setPage(1);
-  }, [users.length]);
+  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE));
 
-  const totalPages = Math.ceil(users.length / PAGE_SIZE);
+  useEffect(() => {
+    setPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
 
   const paginatedUsers = users.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
