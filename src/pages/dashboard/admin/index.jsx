@@ -13,12 +13,12 @@ import {
 
 const AdminDashboardPage = () => {
   const { data, loading, error } = useAdminDashboard();
-  const dashboard = data || {
-    total_users: 124,
-    total_transactions: 538,
-    total_weight: 2840.5,
-    total_points: 284050,
-    total_balance: 5680000,
+  const dashboard = {
+    total_users: data?.total_users ?? 0,
+    total_transactions: data?.total_transactions ?? 0,
+    total_weight: data?.total_weight ?? 0,
+    total_points: data?.total_points ?? 0,
+    total_balance: data?.total_balance ?? 0,
   };
 
   if (loading) {
@@ -68,14 +68,14 @@ const AdminDashboardPage = () => {
 
         <StatCard
           title="Points"
-          value={`${dashboard.total_points || 0} kg`}
+          value={`${dashboard.total_points || 0}`}
           icon={<HiTrophy size={24} />}
           tone="purple"
         />
 
         <StatCard
           title="Revenue"
-          value={`Rp ${dashboard.total_balance.toLocaleString("id-ID") || 0}`}
+          value={`Rp ${dashboard.total_balance.toLocaleString("id-ID")}`}
           icon={<HiCurrencyDollar size={24} />}
           tone="teal"
         />

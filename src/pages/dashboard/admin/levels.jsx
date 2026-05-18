@@ -115,6 +115,9 @@ const AdminLevelsPage = () => {
   };
 
   const handleDelete = async (id) => {
+    const confirmed = window.confirm("Yakin ingin menghapus level ini?");
+    if (!confirmed) return;
+
     try {
       await deleteLevel(id);
     } catch (err) {
@@ -272,11 +275,15 @@ const AdminLevelsPage = () => {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="mb-2 block text-sm font-medium text-[#173c28]">
+                <label
+                  htmlFor="level-name"
+                  className="mb-2 block text-sm font-medium text-[#173c28]"
+                >
                   Nama Level
                 </label>
 
                 <input
+                  id="level-name"
                   type="text"
                   value={form.name}
                   onChange={(event) =>
@@ -297,11 +304,15 @@ const AdminLevelsPage = () => {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-[#173c28]">
+                <label
+                  htmlFor="level-min-points"
+                  className="mb-2 block text-sm font-medium text-[#173c28]"
+                >
                   Minimum Poin
                 </label>
 
                 <input
+                  id="level-min-points"
                   type="number"
                   min="0"
                   value={form.min_points}

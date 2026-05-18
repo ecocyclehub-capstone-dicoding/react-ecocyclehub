@@ -2,11 +2,16 @@ const formatNumber = (value) => Number(value || 0).toLocaleString("id-ID");
 const formatCurrency = (value) => `Rp ${formatNumber(value)}`;
 const formatDate = (value) =>
   value
-    ? new Date(value).toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
+    ? (() => {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime())
+          ? "-"
+          : date.toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            });
+      })()
     : "-";
 
 const TransactionTable = ({ data, onVerify }) => {

@@ -2,7 +2,7 @@ import { useAuthContext } from "@/app/provider/AuthProvider";
 
 const Topbar = ({ title, subtitle }) => {
   const { user } = useAuthContext();
-  const initial = user?.name.charAt(0)?.toUpperCase() || "U";
+  const initial = user?.name?.charAt(0)?.toUpperCase() || "U";
 
   return (
     <div className="mb-8 flex items-center justify-between border-b border-[#ded6ad] pb-6">
