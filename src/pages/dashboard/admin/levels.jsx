@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 
 import {
   MdAdd,
-  MdClose,
   MdDelete,
   MdEdit,
   MdEmojiEvents,
@@ -11,7 +10,10 @@ import {
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
 import DeleteConfirmModal from "@/shared/components/DeleteConfirmModal";
+import FormField from "@/shared/components/FormField";
+import ModalShell from "@/shared/components/ModalShell";
 import SuccessModal from "@/shared/components/SuccessModal";
+import { useFeedbackModal } from "@/shared/hooks/useFeedbackModal";
 
 import { useGamification } from "@/entities/gamification/hooks/useGamification";
 
@@ -55,9 +57,7 @@ const AdminLevelsPage = () => {
 
   const [deletingLevel, setDeletingLevel] = useState(null);
 
-  const [openSuccessModal, setOpenSuccessModal] = useState(false);
-  const [successTitle, setSuccessTitle] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const { feedback, showFeedback, closeFeedback } = useFeedbackModal();
 
   const [form, setForm] = useState(emptyForm);
 
@@ -112,16 +112,13 @@ const AdminLevelsPage = () => {
 
       if (editingLevel) {
         await updateLevel(editingLevel.id, payload);
-        setSuccessTitle("Level Updated");
-        setSuccessMessage("Level updated successfully");
+        showFeedback("Level Updated", "Level updated successfully");
       } else {
         await createLevel(payload);
-        setSuccessTitle("Level Created");
-        setSuccessMessage("Level created successfully");
+        showFeedback("Level Created", "Level created successfully");
       }
 
       closeModal();
-      setOpenSuccessModal(true);
     } catch (err) {
       console.error(err);
     }
@@ -131,9 +128,7 @@ const AdminLevelsPage = () => {
     try {
       await deleteLevel(id);
       setDeletingLevel(null);
-      setSuccessTitle("Level Deleted");
-      setSuccessMessage("Level deleted successfully");
-      setOpenSuccessModal(true);
+      showFeedback("Level Deleted", "Level deleted successfully");
     } catch (err) {
       console.error(err);
     }
@@ -264,109 +259,63 @@ const AdminLevelsPage = () => {
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl">
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-[#0d4f2c]">
-                  {editingLevel ? "Edit Level" : "Tambah Level"}
-                </h2>
+        <ModalShell
+          open={modalOpen}
+          title={editingLevel ? "Edit Level" : "Tambah Level"}
+          description="Tentukan nama level dan batas minimum poin."
+          onClose={closeModal}
+          showCloseButton
+          panelClassName="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl"
+        >
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <FormField
+              label="Nama Level"
+              name="name"
+              value={form.name}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  name: event.target.value,
+                }))
+              }
+              placeholder="Eco Ranger"
+              error={getFirstError(fieldErrors, "name")}
+            />
 
-                <p className="mt-2 text-sm text-gray-500">
-                  Tentukan nama level dan batas minimum poin.
-                </p>
-              </div>
+            <FormField
+              label="Minimum Poin"
+              name="min_points"
+              type="number"
+              value={form.min_points}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  min_points: event.target.value,
+                }))
+              }
+              placeholder="700"
+              error={getFirstError(fieldErrors, "min_points")}
+            />
 
+            <div className="flex items-center justify-end gap-3 pt-3">
               <button
                 type="button"
                 onClick={closeModal}
-                className="rounded-xl bg-gray-100 p-2 text-gray-500"
-                aria-label="Tutup modal"
+                className="rounded-2xl bg-gray-100 px-6 py-3 text-gray-700"
               >
-                <MdClose size={20} />
+                Batal
+              </button>
+
+              <button
+                type="submit"
+                disabled={isMutating}
+                className="rounded-2xl bg-[#14532d] px-6 py-3 font-semibold text-white disabled:opacity-60"
+              >
+                {isMutating ? "Menyimpan..." : "Simpan"}
               </button>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label
-                  htmlFor="level-name"
-                  className="mb-2 block text-sm font-medium text-[#173c28]"
-                >
-                  Nama Level
-                </label>
-
-                <input
-                  id="level-name"
-                  type="text"
-                  value={form.name}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
-                  placeholder="Eco Ranger"
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-4 outline-none focus:border-[#14532d]"
-                />
-
-                {getFirstError(fieldErrors, "name") && (
-                  <p className="mt-2 text-sm font-medium text-red-600">
-                    {getFirstError(fieldErrors, "name")}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="level-min-points"
-                  className="mb-2 block text-sm font-medium text-[#173c28]"
-                >
-                  Minimum Poin
-                </label>
-
-                <input
-                  id="level-min-points"
-                  type="number"
-                  min="0"
-                  value={form.min_points}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      min_points: event.target.value,
-                    }))
-                  }
-                  placeholder="700"
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-4 outline-none focus:border-[#14532d]"
-                />
-
-                {getFirstError(fieldErrors, "min_points") && (
-                  <p className="mt-2 text-sm font-medium text-red-600">
-                    {getFirstError(fieldErrors, "min_points")}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="rounded-2xl bg-gray-100 px-6 py-3 text-gray-700"
-                >
-                  Batal
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={isMutating}
-                  className="rounded-2xl bg-[#14532d] px-6 py-3 font-semibold text-white disabled:opacity-60"
-                >
-                  {isMutating ? "Menyimpan..." : "Simpan"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+          </form>
+        </ModalShell>
       )}
 
       <DeleteConfirmModal
@@ -386,10 +335,10 @@ const AdminLevelsPage = () => {
       />
 
       <SuccessModal
-        open={openSuccessModal}
-        title={successTitle}
-        message={successMessage}
-        onClose={() => setOpenSuccessModal(false)}
+        open={feedback.open}
+        title={feedback.title}
+        message={feedback.message}
+        onClose={closeFeedback}
       />
     </DashboardLayout>
   );

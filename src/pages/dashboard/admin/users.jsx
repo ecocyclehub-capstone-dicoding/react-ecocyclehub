@@ -9,6 +9,7 @@ import UserModal from "@/features/user/components/UserModal";
 import DeleteConfirmModal from "@/shared/components/DeleteConfirmModal";
 import SuccessModal from "@/shared/components/SuccessModal";
 import Pagination from "@/shared/components/Pagination";
+import { useFeedbackModal } from "@/shared/hooks/useFeedbackModal";
 
 import { useUser } from "@/entities/user/hooks/useUser";
 
@@ -29,12 +30,10 @@ const AdminUsersPage = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [openSuccessModal, setOpenSuccessModal] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const [successMessage, setSuccessMessage] = useState("");
-  const [successTitle, setSuccessTitle] = useState("");
+  const { feedback, showFeedback, closeFeedback } = useFeedbackModal();
 
   const totalPages = Math.ceil(users.length / PAGE_SIZE);
   const currentPage = Math.min(page, totalPages || 1);
@@ -51,18 +50,15 @@ const AdminUsersPage = () => {
       if (isEdit) {
         await updateUser(selectedUser.id, payload);
 
-        setSuccessTitle("User Updated");
-        setSuccessMessage("User updated successfully");
+        showFeedback("User Updated", "User updated successfully");
       } else {
         await createUser(payload);
 
-        setSuccessTitle("User Created");
-        setSuccessMessage("User created successfully");
+        showFeedback("User Created", "User created successfully");
       }
 
       setOpenModal(false);
       setSelectedUser(null);
-      setOpenSuccessModal(true);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to save user");
     }
@@ -75,10 +71,7 @@ const AdminUsersPage = () => {
       setOpenDeleteModal(false);
       setSelectedUser(null);
 
-      setSuccessTitle("User Deleted");
-      setSuccessMessage("User deleted successfully");
-
-      setOpenSuccessModal(true);
+      showFeedback("User Deleted", "User deleted successfully");
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete user");
     }
@@ -168,10 +161,10 @@ const AdminUsersPage = () => {
         />
 
         <SuccessModal
-          open={openSuccessModal}
-          title={successTitle}
-          message={successMessage}
-          onClose={() => setOpenSuccessModal(false)}
+          open={feedback.open}
+          title={feedback.title}
+          message={feedback.message}
+          onClose={closeFeedback}
         />
       </div>
     </DashboardLayout>

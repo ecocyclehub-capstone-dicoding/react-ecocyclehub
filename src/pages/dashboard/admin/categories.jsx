@@ -7,6 +7,7 @@ import CategoryModal from "@/features/category/components/CategoryModal";
 import DeleteConfirmModal from "@/shared/components/DeleteConfirmModal";
 import SuccessModal from "@/shared/components/SuccessModal";
 import Pagination from "@/shared/components/Pagination";
+import { useFeedbackModal } from "@/shared/hooks/useFeedbackModal";
 
 import { useCategory } from "@/entities/category/hooks/useCategory";
 
@@ -27,12 +28,9 @@ const AdminCategoriesPage = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [openSuccessModal, setOpenSuccessModal] = useState(false);
-
-  const [successMessage, setSuccessMessage] = useState("");
-  const [successTitle, setSuccessTitle] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const { feedback, showFeedback, closeFeedback } = useFeedbackModal();
 
   const totalPages = Math.ceil(categories.length / PAGE_SIZE);
   const currentPage = Math.min(page, totalPages || 1);
@@ -48,17 +46,14 @@ const AdminCategoriesPage = () => {
 
       if (isEdit) {
         await updateCategory(selectedCategory.id, payload);
-        setSuccessTitle("Category Updated");
-        setSuccessMessage("Category updated successfully");
+        showFeedback("Category Updated", "Category updated successfully");
       } else {
         await createCategory(payload);
-        setSuccessTitle("Category Created");
-        setSuccessMessage("Category created successfully");
+        showFeedback("Category Created", "Category created successfully");
       }
 
       setOpenModal(false);
       setSelectedCategory(null);
-      setOpenSuccessModal(true);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to save category");
     }
@@ -71,9 +66,7 @@ const AdminCategoriesPage = () => {
       setOpenDeleteModal(false);
       setSelectedCategory(null);
 
-      setSuccessTitle("Category Deleted");
-      setSuccessMessage("Category deleted successfully");
-      setOpenSuccessModal(true);
+      showFeedback("Category Deleted", "Category deleted successfully");
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete category");
     }
@@ -164,10 +157,10 @@ const AdminCategoriesPage = () => {
         />
 
         <SuccessModal
-          open={openSuccessModal}
-          title={successTitle}
-          message={successMessage}
-          onClose={() => setOpenSuccessModal(false)}
+          open={feedback.open}
+          title={feedback.title}
+          message={feedback.message}
+          onClose={closeFeedback}
         />
       </div>
     </DashboardLayout>
