@@ -138,7 +138,7 @@ export const useAuth = () => {
       if (refresh) {
         await authApi.logout(refresh);
       }
-    } catch (err) {
+    } catch {
       console.warn("Logout API failed, forcing local logout");
     } finally {
       tokenService.clearTokens();
