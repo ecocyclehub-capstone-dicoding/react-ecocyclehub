@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
 
 import UserTable from "@/features/user/components/UserTable";
 import UserModal from "@/features/user/components/UserModal";
-import UserDeleteModal from "@/features/user/components/UserDeleteModal";
 
+import DeleteConfirmModal from "@/shared/components/DeleteConfirmModal";
 import SuccessModal from "@/shared/components/SuccessModal";
 import Pagination from "@/shared/components/Pagination";
 
@@ -37,12 +37,12 @@ const AdminUsersPage = () => {
   const [successTitle, setSuccessTitle] = useState("");
 
   const totalPages = Math.ceil(users.length / PAGE_SIZE);
+  const currentPage = Math.min(page, totalPages || 1);
 
-  const paginatedUsers = users.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  useEffect(() => {
-    setPage(1);
-  }, [users.length]);
+  const paginatedUsers = users.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   const handleSubmit = async (payload) => {
     try {
@@ -134,7 +134,7 @@ const AdminUsersPage = () => {
             />
 
             <Pagination
-              page={page}
+              page={currentPage}
               totalPages={totalPages}
               onPageChange={setPage}
             />
@@ -152,9 +152,13 @@ const AdminUsersPage = () => {
           onSubmit={handleSubmit}
         />
 
-        <UserDeleteModal
+        <DeleteConfirmModal
           open={openDeleteModal}
-          user={selectedUser}
+          item={selectedUser}
+          title="Delete User"
+          itemLabel="user"
+          itemDescription={selectedUser?.email}
+          confirmText="Delete User"
           loading={isMutating}
           onClose={() => {
             setOpenDeleteModal(false);

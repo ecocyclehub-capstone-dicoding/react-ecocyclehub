@@ -10,6 +10,8 @@ import {
 
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
+import DeleteConfirmModal from "@/shared/components/DeleteConfirmModal";
+import SuccessModal from "@/shared/components/SuccessModal";
 
 import { useGamification } from "@/entities/gamification/hooks/useGamification";
 
@@ -50,6 +52,12 @@ const AdminLevelsPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const [editingLevel, setEditingLevel] = useState(null);
+
+  const [deletingLevel, setDeletingLevel] = useState(null);
+
+  const [openSuccessModal, setOpenSuccessModal] = useState(false);
+  const [successTitle, setSuccessTitle] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [form, setForm] = useState(emptyForm);
 
@@ -104,22 +112,28 @@ const AdminLevelsPage = () => {
 
       if (editingLevel) {
         await updateLevel(editingLevel.id, payload);
+        setSuccessTitle("Level Updated");
+        setSuccessMessage("Level updated successfully");
       } else {
         await createLevel(payload);
+        setSuccessTitle("Level Created");
+        setSuccessMessage("Level created successfully");
       }
 
       closeModal();
+      setOpenSuccessModal(true);
     } catch (err) {
       console.error(err);
     }
   };
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm("Yakin ingin menghapus level ini?");
-    if (!confirmed) return;
-
     try {
       await deleteLevel(id);
+      setDeletingLevel(null);
+      setSuccessTitle("Level Deleted");
+      setSuccessMessage("Level deleted successfully");
+      setOpenSuccessModal(true);
     } catch (err) {
       console.error(err);
     }
@@ -234,7 +248,7 @@ const AdminLevelsPage = () => {
 
                     <button
                       type="button"
-                      onClick={() => handleDelete(level.id)}
+                      onClick={() => setDeletingLevel(level)}
                       disabled={isMutating}
                       className="inline-flex items-center gap-2 rounded-xl bg-red-100 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-200"
                     >
@@ -354,6 +368,29 @@ const AdminLevelsPage = () => {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        open={!!deletingLevel}
+        item={deletingLevel}
+        title="Delete Level"
+        itemLabel="level"
+        itemDescription={
+          deletingLevel
+            ? `Minimum ${formatNumber(deletingLevel.min_points)} poin`
+            : ""
+        }
+        confirmText="Delete Level"
+        loading={isMutating}
+        onClose={() => setDeletingLevel(null)}
+        onConfirm={handleDelete}
+      />
+
+      <SuccessModal
+        open={openSuccessModal}
+        title={successTitle}
+        message={successMessage}
+        onClose={() => setOpenSuccessModal(false)}
+      />
     </DashboardLayout>
   );
 };

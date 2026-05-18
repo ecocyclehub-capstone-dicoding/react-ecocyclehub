@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
 
 import CategoryTable from "@/features/category/components/CategoryTable";
 import CategoryModal from "@/features/category/components/CategoryModal";
-import CategoryDeleteModal from "@/features/category/components/CategoryDeleteModal";
+import DeleteConfirmModal from "@/shared/components/DeleteConfirmModal";
 import SuccessModal from "@/shared/components/SuccessModal";
 import Pagination from "@/shared/components/Pagination";
 
@@ -35,15 +35,12 @@ const AdminCategoriesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const totalPages = Math.ceil(categories.length / PAGE_SIZE);
+  const currentPage = Math.min(page, totalPages || 1);
 
   const paginatedCategories = categories.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE,
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
   );
-
-  useEffect(() => {
-    setPage(1);
-  }, [categories.length]);
 
   const handleSubmit = async (payload) => {
     try {
@@ -134,7 +131,7 @@ const AdminCategoriesPage = () => {
             />
 
             <Pagination
-              page={page}
+              page={currentPage}
               totalPages={totalPages}
               onPageChange={setPage}
             />
@@ -152,9 +149,12 @@ const AdminCategoriesPage = () => {
           onSubmit={handleSubmit}
         />
 
-        <CategoryDeleteModal
+        <DeleteConfirmModal
           open={openDeleteModal}
-          category={selectedCategory}
+          item={selectedCategory}
+          title="Delete Category"
+          itemLabel="category"
+          confirmText="Delete Category"
           loading={isMutating}
           onClose={() => {
             setOpenDeleteModal(false);

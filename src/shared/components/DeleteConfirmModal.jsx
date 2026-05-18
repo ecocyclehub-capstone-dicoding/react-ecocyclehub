@@ -1,36 +1,44 @@
-const CategoryDeleteModal = ({
+const DeleteConfirmModal = ({
   open,
   onClose,
   onConfirm,
   loading = false,
-  category = null,
+  item = null,
+  title = "Delete Item",
+  description = "This action cannot be undone.",
+  itemLabel = "item",
+  itemName,
+  itemDescription,
+  confirmText = "Delete",
+  loadingText = "Deleting...",
 }) => {
-  if (!open || !category) return null;
+  if (!open || !item) return null;
+
+  const displayName = itemName ?? item.name;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-md rounded-3xl bg-white p-8">
-        {/* HEADER */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-red-600">Delete Category</h2>
+          <h2 className="text-2xl font-bold text-red-600">{title}</h2>
 
-          <p className="mt-2 text-sm text-gray-500">
-            This action cannot be undone.
-          </p>
+          <p className="mt-2 text-sm text-gray-500">{description}</p>
         </div>
 
-        {/* CONTENT */}
-        <div className="rounded-2xl bg-red-50 p-5 border border-red-100">
+        <div className="rounded-2xl border border-red-100 bg-red-50 p-5">
           <p className="text-sm text-gray-700">
-            Are you sure you want to delete category:
+            Are you sure you want to delete {itemLabel}:
           </p>
 
           <h3 className="mt-2 text-lg font-semibold text-red-700">
-            {category.name}
+            {displayName}
           </h3>
+
+          {itemDescription && (
+            <p className="mt-1 text-sm text-gray-500">{itemDescription}</p>
+          )}
         </div>
 
-        {/* ACTION */}
         <div className="mt-8 flex items-center justify-end gap-3">
           <button
             type="button"
@@ -43,10 +51,10 @@ const CategoryDeleteModal = ({
           <button
             type="button"
             disabled={loading}
-            onClick={() => onConfirm(category.id)}
+            onClick={() => onConfirm(item.id)}
             className="rounded-2xl bg-red-600 px-6 py-3 text-white disabled:opacity-60"
           >
-            {loading ? "Deleting..." : "Delete Category"}
+            {loading ? loadingText : confirmText}
           </button>
         </div>
       </div>
@@ -54,4 +62,4 @@ const CategoryDeleteModal = ({
   );
 };
 
-export default CategoryDeleteModal;
+export default DeleteConfirmModal;
