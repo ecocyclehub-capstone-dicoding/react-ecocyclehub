@@ -1,5 +1,4 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
 
 const RegisterForm = ({ onSubmit, loading, error, fieldErrors }) => {
   const [form, setForm] = useState({
@@ -144,19 +143,6 @@ const RegisterForm = ({ onSubmit, loading, error, fieldErrors }) => {
       </form>
     </div>
   );
-};
-
-RegisterForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-  fieldErrors: PropTypes.object,
-};
-
-RegisterForm.defaultProps = {
-  loading: false,
-  error: null,
-  fieldErrors: {},
 };
 
 export default RegisterForm;
