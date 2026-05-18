@@ -6,9 +6,10 @@ import { adminSidebar } from "@/features/dashboard/components/configs/admin.conf
 import UserTable from "@/features/user/components/UserTable";
 import UserModal from "@/features/user/components/UserModal";
 import UserDeleteModal from "@/features/user/components/UserDeleteModal";
-import SuccessModal from "@/shared/components/SuccessModal";
 
+import SuccessModal from "@/shared/components/SuccessModal";
 import Pagination from "@/shared/components/Pagination";
+
 import { useUser } from "@/entities/user/hooks/useUser";
 
 const PAGE_SIZE = 6;
@@ -16,8 +17,8 @@ const PAGE_SIZE = 6;
 const AdminUsersPage = () => {
   const {
     users,
-    isFetching,
     isMutating,
+    isFetching,
     error,
     createUser,
     updateUser,
@@ -31,52 +32,30 @@ const AdminUsersPage = () => {
   const [openSuccessModal, setOpenSuccessModal] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
-  const [successTitle, setSuccessTitle] = useState("");
+
   const [successMessage, setSuccessMessage] = useState("");
+  const [successTitle, setSuccessTitle] = useState("");
 
-  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE));
-
-  useEffect(() => {
-    setPage((currentPage) => Math.min(currentPage, totalPages));
-  }, [totalPages]);
+  const totalPages = Math.ceil(users.length / PAGE_SIZE);
 
   const paginatedUsers = users.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  // =====================
-  // CREATE
-  // =====================
-  const handleCreate = () => {
-    setSelectedUser(null);
-    setOpenModal(true);
-  };
+  useEffect(() => {
+    setPage(1);
+  }, [users.length]);
 
-  // =====================
-  // EDIT
-  // =====================
-  const handleEdit = (user) => {
-    setSelectedUser(user);
-    setOpenModal(true);
-  };
-
-  // =====================
-  // DELETE CLICK
-  // =====================
-  const handleDeleteClick = (user) => {
-    setSelectedUser(user);
-    setOpenDeleteModal(true);
-  };
-
-  // =====================
-  // SUBMIT (CREATE / UPDATE)
-  // =====================
   const handleSubmit = async (payload) => {
     try {
-      if (selectedUser) {
+      const isEdit = !!selectedUser;
+
+      if (isEdit) {
         await updateUser(selectedUser.id, payload);
+
         setSuccessTitle("User Updated");
         setSuccessMessage("User updated successfully");
       } else {
         await createUser(payload);
+
         setSuccessTitle("User Created");
         setSuccessMessage("User created successfully");
       }
@@ -89,9 +68,6 @@ const AdminUsersPage = () => {
     }
   };
 
-  // =====================
-  // DELETE
-  // =====================
   const handleDelete = async (id) => {
     try {
       await deleteUser(id);
@@ -101,6 +77,7 @@ const AdminUsersPage = () => {
 
       setSuccessTitle("User Deleted");
       setSuccessMessage("User deleted successfully");
+
       setOpenSuccessModal(true);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete user");
@@ -108,33 +85,52 @@ const AdminUsersPage = () => {
   };
 
   return (
-    <DashboardLayout sidebar={adminSidebar}>
+    <DashboardLayout
+      sidebar={adminSidebar}
+      title="Manajemen Pengguna"
+      subtitle="Kelola akun admin, petugas, dan pengguna aplikasi EcoCycle Hub."
+    >
       <div className="space-y-6">
-        {/* HEADER */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-[#0d4f2c]">User Management</h1>
+        <div className="flex flex-col gap-4 rounded-2xl border border-[#ded6ad] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-[#639922]">
+              Total pengguna aktif
+            </p>
+
+            <h1 className="mt-1 text-3xl font-bold text-[#0d4f2c]">
+              {users.length} Pengguna
+            </h1>
+
+            <p className="mt-2 max-w-2xl text-sm text-gray-500">
+              Atur data pengguna dan hak akses yang digunakan dalam sistem
+              EcoCycle Hub.
+            </p>
+          </div>
 
           <button
-            onClick={handleCreate}
-            className="bg-[#14532d] text-white px-6 py-3 rounded-2xl"
+            onClick={() => setOpenModal(true)}
+            className="rounded-2xl bg-[#14532d] px-6 py-3 font-semibold text-white transition hover:bg-[#0f3d22]"
           >
-            + Add User
+            + Tambah Pengguna
           </button>
         </div>
 
-        {/* LOADING */}
         {isFetching && <div>Loading...</div>}
 
-        {/* ERROR */}
         {error && <div className="text-red-500">{error}</div>}
 
-        {/* TABLE */}
         {!isFetching && !error && (
           <>
             <UserTable
               users={paginatedUsers}
-              onEdit={handleEdit}
-              onDelete={handleDeleteClick}
+              onEdit={(user) => {
+                setSelectedUser(user);
+                setOpenModal(true);
+              }}
+              onDelete={(user) => {
+                setSelectedUser(user);
+                setOpenDeleteModal(true);
+              }}
             />
 
             <Pagination
@@ -145,31 +141,28 @@ const AdminUsersPage = () => {
           </>
         )}
 
-        {/* MODAL CREATE / EDIT */}
         <UserModal
           open={openModal}
+          selectedUser={selectedUser}
+          loading={isMutating}
           onClose={() => {
             setOpenModal(false);
             setSelectedUser(null);
           }}
           onSubmit={handleSubmit}
-          loading={isMutating}
-          selectedUser={selectedUser}
         />
 
-        {/* DELETE MODAL */}
         <UserDeleteModal
           open={openDeleteModal}
+          user={selectedUser}
+          loading={isMutating}
           onClose={() => {
             setOpenDeleteModal(false);
             setSelectedUser(null);
           }}
           onConfirm={handleDelete}
-          loading={isMutating}
-          user={selectedUser}
         />
 
-        {/* SUCCESS MODAL */}
         <SuccessModal
           open={openSuccessModal}
           title={successTitle}

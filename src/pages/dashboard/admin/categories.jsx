@@ -83,24 +83,32 @@ const AdminCategoriesPage = () => {
   };
 
   return (
-    <DashboardLayout sidebar={adminSidebar}>
+    <DashboardLayout
+      sidebar={adminSidebar}
+      title="Kategori Sampah"
+      subtitle="Kelola katalog, harga per kilogram, dan poin untuk setiap jenis sampah."
+    >
       <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex justify-between">
+        <div className="flex flex-col gap-4 rounded-2xl border border-[#ded6ad] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#0d4f2c]">
-              Categories Management
+            <p className="text-sm font-semibold text-[#639922]">
+              Total kategori aktif
+            </p>
+            <h1 className="mt-1 text-3xl font-bold text-[#0d4f2c]">
+              {categories.length} Kategori
             </h1>
-            <p className="text-gray-500 mt-2">
-              Manage waste categories and pricing.
+            <p className="mt-2 max-w-2xl text-sm text-gray-500">
+              Atur harga dan poin yang digunakan petugas saat membuat transaksi
+              setoran sampah.
             </p>
           </div>
 
           <button
             onClick={() => setOpenModal(true)}
-            className="bg-[#14532d] text-white px-6 py-3 rounded-2xl"
+            className="rounded-2xl bg-[#14532d] px-6 py-3 font-semibold text-white transition hover:bg-[#0f3d22]"
           >
-            + Add Category
+            + Tambah Kategori
           </button>
         </div>
 
