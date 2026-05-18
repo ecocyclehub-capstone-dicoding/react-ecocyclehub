@@ -3,6 +3,7 @@ import { transactionApi } from "../api/transaction.api";
 
 export const useTransaction = () => {
   const [transactions, setTransactions] = useState([]);
+  const [pagination, setPagination] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -10,13 +11,15 @@ export const useTransaction = () => {
 
   const [fieldErrors, setFieldErrors] = useState({});
 
-  const getTransactions = useCallback(async () => {
+  const getTransactions = useCallback(async (params = {}) => {
     try {
       setLoading(true);
 
-      const res = await transactionApi.getAll();
+      const res = await transactionApi.getAll(params);
 
-      setTransactions(res.data);
+      setTransactions(res.data || []);
+      setPagination(res.pagination || null);
+      setError(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch transactions");
     } finally {
@@ -75,6 +78,7 @@ export const useTransaction = () => {
 
   return {
     transactions,
+    pagination,
     loading,
     error,
     fieldErrors,

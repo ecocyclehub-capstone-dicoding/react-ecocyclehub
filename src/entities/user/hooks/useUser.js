@@ -85,12 +85,9 @@ export const useUser = () => {
 
   return {
     users,
-
     isFetching,
     isMutating,
-
     error,
-
     getUsers,
     createUser,
     updateUser,
