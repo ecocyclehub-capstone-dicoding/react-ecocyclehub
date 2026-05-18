@@ -1,3 +1,5 @@
+import ModalShell from "./ModalShell";
+
 const DeleteConfirmModal = ({
   open,
   onClose,
@@ -17,48 +19,47 @@ const DeleteConfirmModal = ({
   const displayName = itemName ?? item.name;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-red-600">{title}</h2>
+    <ModalShell
+      open={open}
+      title={title}
+      description={description}
+      panelClassName="w-full max-w-md rounded-3xl bg-white p-8"
+      headerClassName="mb-6"
+      titleClassName="text-2xl font-bold text-red-600"
+    >
+      <div className="rounded-2xl border border-red-100 bg-red-50 p-5">
+        <p className="text-sm text-gray-700">
+          Are you sure you want to delete {itemLabel}:
+        </p>
 
-          <p className="mt-2 text-sm text-gray-500">{description}</p>
-        </div>
+        <h3 className="mt-2 text-lg font-semibold text-red-700">
+          {displayName}
+        </h3>
 
-        <div className="rounded-2xl border border-red-100 bg-red-50 p-5">
-          <p className="text-sm text-gray-700">
-            Are you sure you want to delete {itemLabel}:
-          </p>
-
-          <h3 className="mt-2 text-lg font-semibold text-red-700">
-            {displayName}
-          </h3>
-
-          {itemDescription && (
-            <p className="mt-1 text-sm text-gray-500">{itemDescription}</p>
-          )}
-        </div>
-
-        <div className="mt-8 flex items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-2xl bg-gray-100 px-6 py-3 text-gray-700"
-          >
-            Cancel
-          </button>
-
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => onConfirm(item.id)}
-            className="rounded-2xl bg-red-600 px-6 py-3 text-white disabled:opacity-60"
-          >
-            {loading ? loadingText : confirmText}
-          </button>
-        </div>
+        {itemDescription && (
+          <p className="mt-1 text-sm text-gray-500">{itemDescription}</p>
+        )}
       </div>
-    </div>
+
+      <div className="mt-8 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-2xl bg-gray-100 px-6 py-3 text-gray-700"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => onConfirm(item.id)}
+          className="rounded-2xl bg-red-600 px-6 py-3 text-white disabled:opacity-60"
+        >
+          {loading ? loadingText : confirmText}
+        </button>
+      </div>
+    </ModalShell>
   );
 };
 
