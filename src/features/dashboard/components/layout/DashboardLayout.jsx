@@ -11,11 +11,11 @@ const DashboardLayout = ({ sidebar, title, subtitle, children }) => {
   const sidebarData = buildSidebar(sidebar, user);
 
   return (
-    <div className="min-h-screen flex bg-[#f5f0e0]">
+    <div className="flex min-h-screen bg-[#f5f0e0] text-[#173c28]">
       <Sidebar sidebar={sidebarData} />
 
-      <main className="flex-1 p-10 overflow-y-auto">
-        <Topbar title={title} subtitle={subtitle} />
+      <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-10">
+        {(title || subtitle) && <Topbar title={title} subtitle={subtitle} />}
 
         {children}
       </main>
