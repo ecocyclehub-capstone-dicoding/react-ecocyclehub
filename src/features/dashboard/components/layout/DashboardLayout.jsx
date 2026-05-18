@@ -3,7 +3,7 @@ import Topbar from "./Topbar";
 
 import { buildSidebar } from "@/features/dashboard/lib/buildSidebar";
 
-import { useAuthContext } from "@/app/provider/AuthProvider";
+import { useAuthContext } from "@/app/provider/AuthContext";
 
 const DashboardLayout = ({ sidebar, title, subtitle, children }) => {
   const { user } = useAuthContext();

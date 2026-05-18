@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FiLogOut } from "react-icons/fi";
 import { MdRecycling } from "react-icons/md";
-import { useAuthContext } from "@/app/provider/AuthProvider";
+import { useAuthContext } from "@/app/provider/AuthContext";
 
 const Sidebar = ({ sidebar, onFooterButtonClick }) => {
   const { logout } = useAuthContext();

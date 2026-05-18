@@ -1,4 +1,4 @@
-import { useAuthContext } from "@/app/provider/AuthProvider";
+import { useAuthContext } from "@/app/provider/AuthContext";
 
 const Topbar = ({ title, subtitle }) => {
   const { user } = useAuthContext();
