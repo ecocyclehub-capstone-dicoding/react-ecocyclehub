@@ -4,6 +4,7 @@ import {
   MdSwapHoriz,
   MdCategory,
   MdAssessment,
+  MdEmojiEvents,
 } from "react-icons/md";
 
 export const adminSidebar = {
@@ -31,6 +32,11 @@ export const adminSidebar = {
       label: "Categories",
       icon: MdCategory,
       path: "/admin/categories",
+    },
+    {
+      label: "Level Gamifikasi",
+      icon: MdEmojiEvents,
+      path: "/admin/levels",
     },
   ],
 };

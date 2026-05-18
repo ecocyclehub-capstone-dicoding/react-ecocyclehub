@@ -1,15 +1,14 @@
-import { MdDashboard, MdSwapHoriz, MdEmojiEvents } from "react-icons/md";
+import {
+  MdDashboard,
+  MdSwapHoriz,
+  MdEmojiEvents,
+  MdCategory,
+} from "react-icons/md";
 
 export const officerSidebar = {
   brand: "EcoCycle Hub",
 
-  profile: {
-    name: "Resource Manager",
-    role: "Platinum Curator",
-    avatar: "https://randomuser.me/api/portraits/men/75.jpg",
-  },
-
-  buttonText: "Request Pickup",
+  buttonText: "Logout",
 
   menus: [
     {
@@ -20,10 +19,12 @@ export const officerSidebar = {
     {
       label: "Transactions",
       icon: MdSwapHoriz,
+      path: "/officer/dashboard",
     },
     {
       label: "Badges",
-      icon: MdEmojiEvents,
+      icon: MdCategory,
+      path: "/officer/dashboard",
     },
   ],
 };
