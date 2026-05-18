@@ -4,7 +4,7 @@ import { MdRecycling } from "react-icons/md";
 
 import { Navigate, Outlet } from "react-router-dom";
 
-import { useAuthContext } from "@/app/provider/AuthProvider";
+import { useAuthContext } from "@/app/provider/AuthContext";
 
 import {
   getDashboardPathByRole,

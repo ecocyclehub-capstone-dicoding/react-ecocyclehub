@@ -4,7 +4,7 @@ import {
   normalizeRole,
 } from "@/entities/auth/lib/roleRedirect";
 
-import { useAuthContext } from "@/app/provider/AuthProvider";
+import { useAuthContext } from "@/app/provider/AuthContext";
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthContext();

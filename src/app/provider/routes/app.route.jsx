@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { lazy, Suspense } from "react";
 import { MdRecycling } from "react-icons/md";
 import { createBrowserRouter, Navigate } from "react-router-dom";
