@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { transactionApi } from "../api/transaction.api";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useTransaction = () => {
   const [transactions, setTransactions] = useState([]);
@@ -21,7 +22,7 @@ export const useTransaction = () => {
       setPagination(res.pagination || null);
       setError(null);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch transactions");
+      setError(getApiErrorMessage(err, "Failed to fetch transactions"));
     } finally {
       setLoading(false);
     }
@@ -44,7 +45,7 @@ export const useTransaction = () => {
       if (res?.errors) {
         setFieldErrors(res.errors);
       } else {
-        setError(res?.message || "Failed to create transaction");
+        setError(getApiErrorMessage(err, "Failed to create transaction"));
       }
 
       throw err;
@@ -70,7 +71,7 @@ export const useTransaction = () => {
 
       return res;
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to verify transaction");
+      setError(getApiErrorMessage(err, "Failed to verify transaction"));
 
       throw err;
     }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { gamificationApi } from "../api/gamification.api";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useGamification = () => {
   const [levels, setLevels] = useState([]);
@@ -18,7 +19,7 @@ export const useGamification = () => {
 
       setLevels(res.data || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch levels");
+      setError(getApiErrorMessage(err, "Failed to fetch levels"));
     } finally {
       setIsFetching(false);
     }
@@ -39,7 +40,7 @@ export const useGamification = () => {
       const response = err.response?.data;
 
       setFieldErrors(response?.errors || {});
-      setError(response?.message || "Failed to create level");
+      setError(getApiErrorMessage(err, "Failed to create level"));
 
       throw err;
     } finally {
@@ -64,7 +65,7 @@ export const useGamification = () => {
       const response = err.response?.data;
 
       setFieldErrors(response?.errors || {});
-      setError(response?.message || "Failed to update level");
+      setError(getApiErrorMessage(err, "Failed to update level"));
 
       throw err;
     } finally {
@@ -82,9 +83,7 @@ export const useGamification = () => {
 
       setLevels((current) => current.filter((level) => level.id !== id));
     } catch (err) {
-      const response = err.response?.data;
-
-      setError(response?.message || "Failed to delete level");
+      setError(getApiErrorMessage(err, "Failed to delete level"));
 
       throw err;
     } finally {
