@@ -101,7 +101,10 @@ const AdminUsersPage = () => {
           </div>
 
           <button
-            onClick={() => setOpenModal(true)}
+            onClick={() => {
+              setSelectedUser(null);
+              setOpenModal(true);
+            }}
             className="rounded-2xl bg-[#14532d] px-6 py-3 font-semibold text-white transition hover:bg-[#0f3d22]"
           >
             + Tambah Pengguna

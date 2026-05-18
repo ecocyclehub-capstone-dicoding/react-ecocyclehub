@@ -12,11 +12,22 @@ const ModalShell = ({
   headerClassName = "mb-8",
   titleClassName = "text-2xl font-bold text-[#0d4f2c]",
 }) => {
+  const titleId = useId();
+  const descriptionId = useId();
+
   if (!open) return null;
 
   return (
     <div className={overlayClassName}>
-      <div className={panelClassName}>
+      <div
+        className={panelClassName}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        aria-describedby={description ? descriptionId : undefined}
+        onKeyDown={(e) => e.key === "Escape" && onClose?.()}
+        tabIndex={-1}
+      >
         {(title || description || showCloseButton) && (
           <div
             className={
@@ -27,11 +38,15 @@ const ModalShell = ({
           >
             <div>
               {title && (
-                <h2 className={titleClassName}>{title}</h2>
+                <h2 id={titleId} className={titleClassName}>
+                  {title}
+                </h2>
               )}
 
               {description && (
-                <p className="mt-2 text-sm text-gray-500">{description}</p>
+                <p id={descriptionId} className="mt-2 text-sm text-gray-500">
+                  {description}
+                </p>
               )}
             </div>
 
