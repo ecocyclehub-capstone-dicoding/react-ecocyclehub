@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";
 import RegisterForm from "@/features/auth/components/RegisterForm";
-import { useAuthContext } from "@/app/provider/AuthProvider";
+import { useAuthContext } from "@/app/provider/AuthContext";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
