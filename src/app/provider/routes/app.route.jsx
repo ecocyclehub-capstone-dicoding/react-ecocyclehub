@@ -12,6 +12,15 @@ const AdminUsersPage = lazy(() => import("@/pages/dashboard/admin/users"));
 const AdminLevelsPage = lazy(() => import("@/pages/dashboard/admin/levels"));
 const OfficerDashboardPage = lazy(() => import("@/pages/dashboard/officer"));
 const CustomerDashboardPage = lazy(() => import("@/pages/dashboard/customer"));
+const CustomerTransactionsPage = lazy(
+  () => import("@/pages/dashboard/customer/transactions"),
+);
+const CustomerCategoriesPage = lazy(
+  () => import("@/pages/dashboard/customer/categories"),
+);
+const CustomerLeaderboardPage = lazy(
+  () => import("@/pages/dashboard/customer/leaderboard"),
+);
 
 const AdminTransactionsPage = lazy(
   () => import("@/pages/dashboard/admin/transactions"),
@@ -137,6 +146,18 @@ export const router = createBrowserRouter([
       {
         path: "dashboard",
         element: wrap(CustomerDashboardPage),
+      },
+      {
+        path: "transactions",
+        element: wrap(CustomerTransactionsPage),
+      },
+      {
+        path: "categories",
+        element: wrap(CustomerCategoriesPage),
+      },
+      {
+        path: "leaderboard",
+        element: wrap(CustomerLeaderboardPage),
       },
     ],
   },
