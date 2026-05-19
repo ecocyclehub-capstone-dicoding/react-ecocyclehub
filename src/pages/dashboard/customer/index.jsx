@@ -1,11 +1,12 @@
+import { useEffect } from "react";
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import CustomerLevelCard from "@/features/dashboard/components/cards/CustomerLevelCard";
 import StatCard from "@/features/dashboard/components/cards/StatCard";
-import SectionWrapper from "@/features/dashboard/components/common/SectionWrapper";
-import CustomerTransactionList from "@/features/dashboard/components/sections/CustomerTransactionList";
+import TransactionTable from "@/features/transaction/components/TransactionTable";
 import { customerSidebar } from "@/features/dashboard/components/configs/customer.config";
 import { useDashboard } from "@/entities/dashboard/hooks/useDashboard";
 import { useGamification } from "@/entities/gamification/hooks/useGamification";
+import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
 import { formatCurrency, formatNumber } from "@/shared/lib/formatters";
 import { useAuthContext } from "@/app/provider/AuthContext";
 import { MdAccountBalanceWallet, MdReceiptLong, MdStars } from "react-icons/md";
@@ -14,6 +15,15 @@ const CustomerDashboardPage = () => {
   const { user } = useAuthContext();
   const { data, loading, error } = useDashboard("customer");
   const { levels } = useGamification();
+  const {
+    transactions,
+    isFetching: transactionsLoading,
+    getTransactionHistory,
+  } = useTransaction();
+
+  useEffect(() => {
+    getTransactionHistory();
+  }, [getTransactionHistory]);
 
   const dashboard = {
     total_points: data?.total_points ?? 0,
@@ -21,6 +31,9 @@ const CustomerDashboardPage = () => {
     total_transactions: data?.total_transactions ?? 0,
     recent_transactions: data?.recent_transactions ?? [],
   };
+  const recentTransactions = transactions.length
+    ? transactions.slice(0, 3)
+    : dashboard.recent_transactions;
 
   return (
     <DashboardLayout
@@ -62,15 +75,12 @@ const CustomerDashboardPage = () => {
           />
         </div>
 
-        {loading ? (
+        {loading || transactionsLoading ? (
           <div className="rounded-2xl bg-white p-6 text-sm font-medium text-gray-500">
             Loading...
           </div>
         ) : (
-          <CustomerTransactionList
-            items={dashboard.recent_transactions}
-            compact
-          />
+          <TransactionTable data={recentTransactions} audience="customer" />
         )}
       </div>
     </DashboardLayout>

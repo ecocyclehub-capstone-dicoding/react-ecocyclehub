@@ -1,12 +1,11 @@
 import { useEffect } from "react";
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import { customerSidebar } from "@/features/dashboard/components/configs/customer.config";
-import SectionWrapper from "@/features/dashboard/components/common/SectionWrapper";
-import CustomerTransactionList from "@/features/dashboard/components/sections/CustomerTransactionList";
+import TransactionTable from "@/features/transaction/components/TransactionTable";
 import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
 
 const CustomerTransactionsPage = () => {
-  const { transactions, loading, error, getTransactionHistory } =
+  const { transactions, isFetching, error, getTransactionHistory } =
     useTransaction();
 
   useEffect(() => {
@@ -19,7 +18,7 @@ const CustomerTransactionsPage = () => {
       title="Riwayat Transaksi"
       subtitle="Lihat status, nilai, poin, dan detail setoran sampah."
     >
-      {loading && (
+      {isFetching && (
         <div className="rounded-2xl bg-white p-6 text-sm font-medium text-gray-500">
           Loading...
         </div>
@@ -31,7 +30,9 @@ const CustomerTransactionsPage = () => {
         </div>
       )}
 
-      {!loading && !error && <CustomerTransactionList items={transactions} />}
+      {!isFetching && !error && (
+        <TransactionTable data={transactions} audience="customer" />
+      )}
     </DashboardLayout>
   );
 };
