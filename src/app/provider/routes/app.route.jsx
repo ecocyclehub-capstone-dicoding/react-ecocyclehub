@@ -1,17 +1,17 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { lazy, Suspense } from "react";
 import { MdRecycling } from "react-icons/md";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-
 import { authRoutes } from "./auth.route";
 import { notFoundRoutes } from "./not-found.route";
 import ProtectedRoute from "./ProtectedRoute";
 
 const DashboardRedirectPage = lazy(() => import("@/pages/dashboard"));
 const AdminDashboardPage = lazy(() => import("@/pages/dashboard/admin"));
+const AdminUsersPage = lazy(() => import("@/pages/dashboard/admin/users"));
+const AdminLevelsPage = lazy(() => import("@/pages/dashboard/admin/levels"));
 const OfficerDashboardPage = lazy(() => import("@/pages/dashboard/officer"));
 const CustomerDashboardPage = lazy(() => import("@/pages/dashboard/customer"));
-
-const AdminUsersPage = lazy(() => import("@/pages/dashboard/admin/users"));
 
 const AdminTransactionsPage = lazy(
   () => import("@/pages/dashboard/admin/transactions"),
@@ -89,6 +89,10 @@ export const router = createBrowserRouter([
       {
         path: "categories",
         element: wrap(AdminCategoriesPage),
+      },
+      {
+        path: "levels",
+        element: wrap(AdminLevelsPage),
       },
     ],
   },

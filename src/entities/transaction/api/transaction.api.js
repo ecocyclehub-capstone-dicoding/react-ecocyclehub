@@ -1,8 +1,13 @@
 import { axiosInstance } from "@/shared/api/axiosInstance";
 
 export const transactionApi = {
-  getAll: async () => {
-    const res = await axiosInstance.get("/transactions/");
+  getAll: async (params = {}) => {
+    const res = await axiosInstance.get("/transactions/all/", { params });
+    return res.data;
+  },
+
+  getById: async (transactionId) => {
+    const res = await axiosInstance.get(`/transactions/all/${transactionId}/`);
     return res.data;
   },
 

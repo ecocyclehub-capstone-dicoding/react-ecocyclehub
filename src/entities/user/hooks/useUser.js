@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { userApi } from "../api/user.api";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useUser = () => {
   const [users, setUsers] = useState([]);
@@ -19,7 +20,7 @@ export const useUser = () => {
       setUsers(res.data || []);
       setError(null);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch users");
+      setError(getApiErrorMessage(err, "Failed to fetch users"));
     } finally {
       setIsFetching(false);
     }
@@ -36,7 +37,7 @@ export const useUser = () => {
 
       return res;
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create user");
+      setError(getApiErrorMessage(err, "Failed to create user"));
       throw err;
     } finally {
       setIsMutating(false);
@@ -56,7 +57,7 @@ export const useUser = () => {
 
       return res;
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update user");
+      setError(getApiErrorMessage(err, "Failed to update user"));
       throw err;
     } finally {
       setIsMutating(false);
@@ -72,7 +73,7 @@ export const useUser = () => {
 
       setUsers((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete user");
+      setError(getApiErrorMessage(err, "Failed to delete user"));
       throw err;
     } finally {
       setIsMutating(false);
@@ -80,17 +81,18 @@ export const useUser = () => {
   };
 
   useEffect(() => {
-    getUsers();
-  }, []);
+    const timeoutId = window.setTimeout(() => {
+      getUsers();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [getUsers]);
 
   return {
     users,
-
     isFetching,
     isMutating,
-
     error,
-
     getUsers,
     createUser,
     updateUser,

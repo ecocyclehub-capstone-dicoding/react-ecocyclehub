@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
 
 import CategoryTable from "@/features/category/components/CategoryTable";
 import CategoryModal from "@/features/category/components/CategoryModal";
-import CategoryDeleteModal from "@/features/category/components/CategoryDeleteModal";
+import DeleteConfirmModal from "@/shared/components/DeleteConfirmModal";
 import SuccessModal from "@/shared/components/SuccessModal";
 import Pagination from "@/shared/components/Pagination";
+import { useFeedbackModal } from "@/shared/hooks/useFeedbackModal";
 
 import { useCategory } from "@/entities/category/hooks/useCategory";
 
@@ -27,23 +28,17 @@ const AdminCategoriesPage = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [openSuccessModal, setOpenSuccessModal] = useState(false);
-
-  const [successMessage, setSuccessMessage] = useState("");
-  const [successTitle, setSuccessTitle] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const { feedback, showFeedback, closeFeedback } = useFeedbackModal();
 
   const totalPages = Math.ceil(categories.length / PAGE_SIZE);
+  const currentPage = Math.min(page, totalPages || 1);
 
   const paginatedCategories = categories.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE,
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
   );
-
-  useEffect(() => {
-    setPage(1);
-  }, [categories.length]);
 
   const handleSubmit = async (payload) => {
     try {
@@ -51,17 +46,14 @@ const AdminCategoriesPage = () => {
 
       if (isEdit) {
         await updateCategory(selectedCategory.id, payload);
-        setSuccessTitle("Category Updated");
-        setSuccessMessage("Category updated successfully");
+        showFeedback("Category Updated", "Category updated successfully");
       } else {
         await createCategory(payload);
-        setSuccessTitle("Category Created");
-        setSuccessMessage("Category created successfully");
+        showFeedback("Category Created", "Category created successfully");
       }
 
       setOpenModal(false);
       setSelectedCategory(null);
-      setOpenSuccessModal(true);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to save category");
     }
@@ -74,33 +66,39 @@ const AdminCategoriesPage = () => {
       setOpenDeleteModal(false);
       setSelectedCategory(null);
 
-      setSuccessTitle("Category Deleted");
-      setSuccessMessage("Category deleted successfully");
-      setOpenSuccessModal(true);
+      showFeedback("Category Deleted", "Category deleted successfully");
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete category");
     }
   };
 
   return (
-    <DashboardLayout sidebar={adminSidebar}>
+    <DashboardLayout
+      sidebar={adminSidebar}
+      title="Kategori Sampah"
+      subtitle="Kelola katalog, harga per kilogram, dan poin untuk setiap jenis sampah."
+    >
       <div className="space-y-6">
         {/* HEADER */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 rounded-2xl border border-[#ded6ad] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#0d4f2c]">
-              Categories Management
+            <p className="text-sm font-semibold text-[#639922]">
+              Total kategori aktif
+            </p>
+            <h1 className="mt-1 text-3xl font-bold text-[#0d4f2c]">
+              {categories.length} Kategori
             </h1>
-            <p className="text-gray-500 mt-2">
-              Manage waste categories and pricing.
+            <p className="mt-2 max-w-2xl text-sm text-gray-500">
+              Atur harga dan poin yang digunakan petugas saat membuat transaksi
+              setoran sampah.
             </p>
           </div>
 
           <button
             onClick={() => setOpenModal(true)}
-            className="bg-[#14532d] text-white px-6 py-3 rounded-2xl"
+            className="rounded-2xl bg-[#14532d] px-6 py-3 font-semibold text-white transition hover:bg-[#0f3d22]"
           >
-            + Add Category
+            + Tambah Kategori
           </button>
         </div>
 
@@ -126,7 +124,7 @@ const AdminCategoriesPage = () => {
             />
 
             <Pagination
-              page={page}
+              page={currentPage}
               totalPages={totalPages}
               onPageChange={setPage}
             />
@@ -144,9 +142,12 @@ const AdminCategoriesPage = () => {
           onSubmit={handleSubmit}
         />
 
-        <CategoryDeleteModal
+        <DeleteConfirmModal
           open={openDeleteModal}
-          category={selectedCategory}
+          item={selectedCategory}
+          title="Delete Category"
+          itemLabel="category"
+          confirmText="Delete Category"
           loading={isMutating}
           onClose={() => {
             setOpenDeleteModal(false);
@@ -156,10 +157,10 @@ const AdminCategoriesPage = () => {
         />
 
         <SuccessModal
-          open={openSuccessModal}
-          title={successTitle}
-          message={successMessage}
-          onClose={() => setOpenSuccessModal(false)}
+          open={feedback.open}
+          title={feedback.title}
+          message={feedback.message}
+          onClose={closeFeedback}
         />
       </div>
     </DashboardLayout>

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
 
 const LoginForm = ({ onSubmit, loading, error, fieldErrors }) => {
   const [form, setForm] = useState({
@@ -102,19 +101,6 @@ const LoginForm = ({ onSubmit, loading, error, fieldErrors }) => {
       </form>
     </div>
   );
-};
-
-LoginForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-  fieldErrors: PropTypes.object,
-};
-
-LoginForm.defaultProps = {
-  loading: false,
-  error: null,
-  fieldErrors: {},
 };
 
 export default LoginForm;

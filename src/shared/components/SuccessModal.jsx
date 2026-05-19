@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { MdCheckCircle } from "react-icons/md";
 
@@ -53,13 +52,6 @@ const SuccessModal = ({ open, title, message, onClose }) => {
       </div>
     </div>
   );
-};
-
-SuccessModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  title: PropTypes.string,
-  message: PropTypes.string,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default SuccessModal;

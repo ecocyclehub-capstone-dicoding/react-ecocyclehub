@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { categoryApi } from "../api/category.api";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useCategory = () => {
   const [categories, setCategories] = useState([]);
@@ -8,7 +9,7 @@ export const useCategory = () => {
   const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState(null);
 
-  const getCategories = async () => {
+  const getCategories = useCallback(async () => {
     try {
       setError(null);
       setIsFetching(true);
@@ -17,11 +18,11 @@ export const useCategory = () => {
 
       setCategories(res.data || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch categories");
+      setError(getApiErrorMessage(err, "Failed to fetch categories"));
     } finally {
       setIsFetching(false);
     }
-  };
+  }, []);
 
   const createCategory = async (payload) => {
     try {
@@ -31,8 +32,6 @@ export const useCategory = () => {
       await getCategories();
 
       return res;
-    } catch (err) {
-      throw err;
     } finally {
       setIsMutating(false);
     }
@@ -46,8 +45,6 @@ export const useCategory = () => {
       await getCategories();
 
       return res;
-    } catch (err) {
-      throw err;
     } finally {
       setIsMutating(false);
     }
@@ -59,16 +56,18 @@ export const useCategory = () => {
       await categoryApi.deleteCategory(id);
 
       setCategories((prev) => prev.filter((item) => item.id !== id));
-    } catch (err) {
-      throw err;
     } finally {
       setIsMutating(false);
     }
   };
 
   useEffect(() => {
-    getCategories();
-  }, []);
+    const timeoutId = window.setTimeout(() => {
+      getCategories();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [getCategories]);
 
   return {
     categories,

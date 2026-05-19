@@ -1,15 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-
-import { useUser } from "@/entities/user/hooks/useUser";
-import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
+import { useCallback, useEffect, useState } from "react";
 import { dashboardApi } from "../api/dashboard.api";
+import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useAdminDashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getDashboard = async () => {
+  const getDashboard = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -18,15 +16,19 @@ export const useAdminDashboard = () => {
 
       setData(res.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to load dashboard");
+      setError(getApiErrorMessage(err, "Failed to load dashboard"));
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    getDashboard();
-  }, []);
+    const timeoutId = window.setTimeout(() => {
+      getDashboard();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [getDashboard]);
 
   return {
     data,
