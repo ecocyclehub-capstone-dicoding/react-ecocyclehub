@@ -30,7 +30,7 @@ const tones = [
 const formatCurrency = (value) =>
   `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
 
-const CategoryTable = ({ data, onEdit, onDelete }) => {
+const CategoryTable = ({ data, onEdit, onDelete, readOnly = false }) => {
   if (!data?.length) {
     return (
       <div className="rounded-2xl border border-dashed border-[#ded6ad] bg-white p-10 text-center shadow-sm">
@@ -73,25 +73,27 @@ const CategoryTable = ({ data, onEdit, onDelete }) => {
                 </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => onEdit(item)}
-                  className="rounded-xl bg-white/70 p-2 transition hover:bg-white"
-                  aria-label={`Edit ${item.name}`}
-                >
-                  <MdEdit size={18} />
-                </button>
+              {!readOnly && (
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onEdit?.(item)}
+                    className="rounded-xl bg-white/70 p-2 transition hover:bg-white"
+                    aria-label={`Edit ${item.name}`}
+                  >
+                    <MdEdit size={18} />
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => onDelete(item)}
-                  className="rounded-xl bg-red-100 p-2 text-red-700 transition hover:bg-red-200"
-                  aria-label={`Hapus ${item.name}`}
-                >
-                  <MdDelete size={18} />
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => onDelete?.(item)}
+                    className="rounded-xl bg-red-100 p-2 text-red-700 transition hover:bg-red-200"
+                    aria-label={`Hapus ${item.name}`}
+                  >
+                    <MdDelete size={18} />
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">

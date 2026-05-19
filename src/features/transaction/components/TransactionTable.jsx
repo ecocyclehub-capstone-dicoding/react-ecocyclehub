@@ -1,18 +1,8 @@
-const formatNumber = (value) => Number(value || 0).toLocaleString("id-ID");
-const formatCurrency = (value) => `Rp ${formatNumber(value)}`;
-const formatDate = (value) =>
-  value
-    ? (() => {
-        const date = new Date(value);
-        return Number.isNaN(date.getTime())
-          ? "-"
-          : date.toLocaleDateString("id-ID", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            });
-      })()
-    : "-";
+import {
+  formatCurrency,
+  formatDate,
+  formatNumber,
+} from "@/shared/lib/formatters";
 
 const TransactionTable = ({ data, onVerify }) => {
   return (
