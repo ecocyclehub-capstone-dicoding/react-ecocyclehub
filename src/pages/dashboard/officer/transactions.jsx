@@ -1,0 +1,175 @@
+import { useEffect, useMemo, useState } from "react";
+import { MdAdd } from "react-icons/md";
+
+import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
+import { officerSidebar } from "@/features/dashboard/components/configs/officer.config";
+import TransactionTable from "@/features/transaction/components/TransactionTable";
+import TransactionCreateModal from "@/features/transaction/components/TransactionCreateModal";
+import Pagination from "@/shared/components/Pagination";
+import SuccessModal from "@/shared/components/SuccessModal";
+import { useFeedbackModal } from "@/shared/hooks/useFeedbackModal";
+import { useCategory } from "@/entities/category/hooks/useCategory";
+import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
+import { useUser } from "@/entities/user/hooks/useUser";
+import {
+  TRANSACTION_PAGE_SIZE,
+  TRANSACTION_STATUS_OPTIONS,
+} from "@/features/transaction/lib/transactionConstants";
+
+const OfficerTransactionsPage = () => {
+  const {
+    transactions,
+    pagination,
+    isFetching,
+    isMutating,
+    error,
+    fieldErrors,
+    getTransactions,
+    createTransaction,
+    verifyTransaction,
+  } = useTransaction();
+  const { categories } = useCategory();
+  const { users } = useUser();
+  const { feedback, showFeedback, closeFeedback } = useFeedbackModal();
+
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState("pending");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [verifyingId, setVerifyingId] = useState(null);
+
+  const params = useMemo(
+    () => ({
+      page,
+      page_size: TRANSACTION_PAGE_SIZE,
+      ...(status ? { status } : {}),
+    }),
+    [page, status],
+  );
+
+  const customers = useMemo(
+    () => users.filter((user) => user.role?.key === "customer"),
+    [users],
+  );
+
+  useEffect(() => {
+    getTransactions(params);
+  }, [getTransactions, params]);
+
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
+    setPage(1);
+  };
+
+  const handleCreate = async (payload) => {
+    await createTransaction(payload, params);
+    setModalOpen(false);
+    showFeedback("Transaksi Dibuat", "Transaksi berhasil disimpan.");
+  };
+
+  const handleVerify = async (id) => {
+    try {
+      setVerifyingId(id);
+      await verifyTransaction(id);
+      await getTransactions(params);
+      showFeedback("Transaksi Diverifikasi", "Status transaksi diperbarui.");
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
+  return (
+    <DashboardLayout
+      sidebar={officerSidebar}
+      title="Kelola Transaksi"
+      subtitle="Buat transaksi setoran sampah dan verifikasi transaksi pending."
+    >
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 rounded-2xl border border-[#ded6ad] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-[#639922]">
+              Total transaksi
+            </p>
+            <h2 className="mt-1 text-3xl font-bold text-[#0d4f2c]">
+              {(pagination?.count ?? transactions.length).toLocaleString(
+                "id-ID",
+              )}
+            </h2>
+            <p className="mt-2 text-sm text-gray-500">
+              Gunakan filter status untuk memprioritaskan transaksi pending.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <select
+              value={status}
+              onChange={handleStatusChange}
+              className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-[#173c28] outline-none focus:border-[#14532d]"
+            >
+              {TRANSACTION_STATUS_OPTIONS.map((option) => (
+                <option key={option.label} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={() => setModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#14532d] px-6 py-3 font-semibold text-white transition hover:bg-[#0f3d22]"
+            >
+              <MdAdd size={18} />
+              Buat Transaksi
+            </button>
+          </div>
+        </div>
+
+        {isFetching && (
+          <div className="rounded-2xl bg-white p-6 text-sm font-medium text-gray-500 shadow-sm">
+            Loading...
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
+            {error}
+          </div>
+        )}
+
+        {!isFetching && !error && (
+          <>
+            <TransactionTable
+              data={transactions}
+              onVerify={handleVerify}
+              verifyingId={verifyingId}
+            />
+
+            <Pagination
+              page={page}
+              totalPages={pagination?.total_pages || 1}
+              onPageChange={setPage}
+            />
+          </>
+        )}
+      </div>
+
+      <TransactionCreateModal
+        open={modalOpen}
+        customers={customers}
+        categories={categories}
+        fieldErrors={fieldErrors}
+        loading={isMutating}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleCreate}
+      />
+
+      <SuccessModal
+        open={feedback.open}
+        title={feedback.title}
+        message={feedback.message}
+        onClose={closeFeedback}
+      />
+    </DashboardLayout>
+  );
+};
+
+export default OfficerTransactionsPage;

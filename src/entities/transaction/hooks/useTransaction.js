@@ -6,7 +6,8 @@ export const useTransaction = () => {
   const [transactions, setTransactions] = useState([]);
   const [pagination, setPagination] = useState(null);
 
-  const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
 
   const [error, setError] = useState(null);
 
@@ -14,7 +15,7 @@ export const useTransaction = () => {
 
   const getTransactions = useCallback(async (params = {}) => {
     try {
-      setLoading(true);
+      setIsFetching(true);
 
       const res = await transactionApi.getAll(params);
 
@@ -24,19 +25,35 @@ export const useTransaction = () => {
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to fetch transactions"));
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   }, []);
 
-  const createTransaction = async (payload) => {
+  const getTransactionHistory = useCallback(async () => {
     try {
-      setLoading(true);
+      setIsFetching(true);
+
+      const res = await transactionApi.getHistory();
+
+      setTransactions(res.data || []);
+      setPagination(res.pagination || null);
+      setError(null);
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to fetch transaction history"));
+    } finally {
+      setIsFetching(false);
+    }
+  }, []);
+
+  const createTransaction = async (payload, refreshParams) => {
+    try {
+      setIsMutating(true);
       setError(null);
       setFieldErrors({});
 
       const res = await transactionApi.create(payload);
 
-      await getTransactions();
+      await getTransactions(refreshParams);
 
       return res;
     } catch (err) {
@@ -50,12 +67,14 @@ export const useTransaction = () => {
 
       throw err;
     } finally {
-      setLoading(false);
+      setIsMutating(false);
     }
   };
 
   const verifyTransaction = async (id) => {
     try {
+      setIsMutating(true);
+
       const res = await transactionApi.verify(id);
 
       setTransactions((prev) =>
@@ -74,16 +93,23 @@ export const useTransaction = () => {
       setError(getApiErrorMessage(err, "Failed to verify transaction"));
 
       throw err;
+    } finally {
+      setIsMutating(false);
     }
   };
+
+  const loading = isFetching || isMutating;
 
   return {
     transactions,
     pagination,
     loading,
+    isFetching,
+    isMutating,
     error,
     fieldErrors,
     getTransactions,
+    getTransactionHistory,
     createTransaction,
     verifyTransaction,
   };

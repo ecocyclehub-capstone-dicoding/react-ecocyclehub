@@ -1,59 +1,88 @@
+import { useEffect } from "react";
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
-import ProgressCard from "@/features/dashboard/components/cards/ProgressCard";
-import RewardCard from "@/features/dashboard/components/cards/RewardCard";
-import SectionWrapper from "@/features/dashboard/components/common/SectionWrapper";
-import TransactionTable from "@/features/dashboard/components/sections/TransactionTable";
-import RedeemBanner from "@/features/dashboard/components/sections/RedeemBanner";
+import CustomerLevelCard from "@/features/dashboard/components/cards/CustomerLevelCard";
+import StatCard from "@/features/dashboard/components/cards/StatCard";
+import TransactionTable from "@/features/transaction/components/TransactionTable";
 import { customerSidebar } from "@/features/dashboard/components/configs/customer.config";
-
-const transactions = [
-  {
-    id: 1,
-    date: "12 May 2026",
-    category: "Plastic",
-    weight: "12 Kg",
-    points: "240",
-    status: "Processed",
-  },
-  {
-    id: 2,
-    date: "10 May 2026",
-    category: "Glass",
-    weight: "4 Kg",
-    points: "80",
-    status: "Verified",
-  },
-];
+import { useDashboard } from "@/entities/dashboard/hooks/useDashboard";
+import { useGamification } from "@/entities/gamification/hooks/useGamification";
+import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
+import { formatCurrency, formatNumber } from "@/shared/lib/formatters";
+import { useAuthContext } from "@/app/provider/AuthContext";
+import { MdAccountBalanceWallet, MdReceiptLong, MdStars } from "react-icons/md";
 
 const CustomerDashboardPage = () => {
+  const { user } = useAuthContext();
+  const { data, loading, error } = useDashboard("customer");
+  const { levels } = useGamification();
+  const {
+    transactions,
+    isFetching: transactionsLoading,
+    getTransactionHistory,
+  } = useTransaction();
+
+  useEffect(() => {
+    getTransactionHistory();
+  }, [getTransactionHistory]);
+
+  const dashboard = {
+    total_points: data?.total_points ?? 0,
+    total_balance: data?.total_balance ?? 0,
+    total_transactions: data?.total_transactions ?? 0,
+    recent_transactions: data?.recent_transactions ?? [],
+  };
+  const recentTransactions = transactions.length
+    ? transactions.slice(0, 3)
+    : dashboard.recent_transactions;
+
   return (
     <DashboardLayout
       sidebar={customerSidebar}
-      title="Customer Dashboard"
-      subtitle="Track your eco contribution"
+      title={`Halo, ${user?.name || "Nasabah"}`}
+      subtitle="Pantau poin, saldo, level, dan transaksi setoran sampahmu."
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <ProgressCard level="Gold Member" current={820} total={1000} />
+      <div className="space-y-6">
+        {error && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-medium text-amber-700">
+            {error}
+          </div>
+        )}
 
-        <RewardCard
-          title="Total Points"
-          value="820"
-          subtitle="Available eco points"
-          dark
+        <CustomerLevelCard
+          points={dashboard.total_points}
+          balance={dashboard.total_balance}
+          levels={levels}
         />
 
-        <RewardCard
-          title="Total Deposits"
-          value="52"
-          subtitle="Successful waste deposits"
-        />
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          <StatCard
+            title="Total Poin"
+            value={loading ? "..." : formatNumber(dashboard.total_points)}
+            icon={<MdStars size={24} />}
+            tone="green"
+          />
+          <StatCard
+            title="Saldo Tabungan"
+            value={loading ? "..." : formatCurrency(dashboard.total_balance)}
+            icon={<MdAccountBalanceWallet size={24} />}
+            tone="teal"
+          />
+          <StatCard
+            title="Total Transaksi"
+            value={loading ? "..." : formatNumber(dashboard.total_transactions)}
+            icon={<MdReceiptLong size={24} />}
+            tone="blue"
+          />
+        </div>
+
+        {loading || transactionsLoading ? (
+          <div className="rounded-2xl bg-white p-6 text-sm font-medium text-gray-500">
+            Loading...
+          </div>
+        ) : (
+          <TransactionTable data={recentTransactions} audience="customer" />
+        )}
       </div>
-
-      <SectionWrapper title="Recent Activity" action="View History">
-        <TransactionTable items={transactions} />
-      </SectionWrapper>
-
-      <RedeemBanner />
     </DashboardLayout>
   );
 };

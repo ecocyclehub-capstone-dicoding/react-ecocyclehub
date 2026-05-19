@@ -5,13 +5,29 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { authRoutes } from "./auth.route";
 import { notFoundRoutes } from "./not-found.route";
 import ProtectedRoute from "./ProtectedRoute";
+import NotFoundPage from "@/pages/not-found";
 
 const DashboardRedirectPage = lazy(() => import("@/pages/dashboard"));
 const AdminDashboardPage = lazy(() => import("@/pages/dashboard/admin"));
 const AdminUsersPage = lazy(() => import("@/pages/dashboard/admin/users"));
 const AdminLevelsPage = lazy(() => import("@/pages/dashboard/admin/levels"));
 const OfficerDashboardPage = lazy(() => import("@/pages/dashboard/officer"));
+const OfficerTransactionsPage = lazy(
+  () => import("@/pages/dashboard/officer/transactions"),
+);
+const OfficerCategoriesPage = lazy(
+  () => import("@/pages/dashboard/officer/categories"),
+);
 const CustomerDashboardPage = lazy(() => import("@/pages/dashboard/customer"));
+const CustomerTransactionsPage = lazy(
+  () => import("@/pages/dashboard/customer/transactions"),
+);
+const CustomerCategoriesPage = lazy(
+  () => import("@/pages/dashboard/customer/categories"),
+);
+const CustomerLeaderboardPage = lazy(
+  () => import("@/pages/dashboard/customer/leaderboard"),
+);
 
 const AdminTransactionsPage = lazy(
   () => import("@/pages/dashboard/admin/transactions"),
@@ -37,6 +53,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <Navigate to="/login" replace />,
+    errorElement: <NotFoundPage />,
   },
 
   ...authRoutes,
@@ -50,6 +67,7 @@ export const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <ProtectedRoute allowedRoles={["admin", "officer", "customer"]} />,
+    errorElement: <NotFoundPage />,
 
     children: [
       {
@@ -68,6 +86,7 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     element: <ProtectedRoute allowedRoles={["admin"]} />,
+    errorElement: <NotFoundPage />,
     children: [
       {
         index: true,
@@ -106,6 +125,7 @@ export const router = createBrowserRouter([
   {
     path: "/officer",
     element: <ProtectedRoute allowedRoles={["officer"]} />,
+    errorElement: <NotFoundPage />,
 
     children: [
       {
@@ -115,6 +135,14 @@ export const router = createBrowserRouter([
       {
         path: "dashboard",
         element: wrap(OfficerDashboardPage),
+      },
+      {
+        path: "transactions",
+        element: wrap(OfficerTransactionsPage),
+      },
+      {
+        path: "categories",
+        element: wrap(OfficerCategoriesPage),
       },
     ],
   },
@@ -128,6 +156,7 @@ export const router = createBrowserRouter([
   {
     path: "/customer",
     element: <ProtectedRoute allowedRoles={["customer"]} />,
+    errorElement: <NotFoundPage />,
 
     children: [
       {
@@ -137,6 +166,18 @@ export const router = createBrowserRouter([
       {
         path: "dashboard",
         element: wrap(CustomerDashboardPage),
+      },
+      {
+        path: "transactions",
+        element: wrap(CustomerTransactionsPage),
+      },
+      {
+        path: "categories",
+        element: wrap(CustomerCategoriesPage),
+      },
+      {
+        path: "leaderboard",
+        element: wrap(CustomerLeaderboardPage),
       },
     ],
   },

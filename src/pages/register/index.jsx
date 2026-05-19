@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "@/shared/layouts/AuthLayout";
 import HeroPanel from "@/features/auth/components/HeroPanel";

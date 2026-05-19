@@ -17,8 +17,8 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
   };
 
   return (
-    <aside className="sticky top-0 flex min-h-screen w-[260px] shrink-0 flex-col justify-between bg-[#0f2419] text-white shadow-2xl shadow-[#0f2419]/10">
-      <div>
+    <aside className="sticky top-0 flex h-screen w-[260px] shrink-0 flex-col bg-[#0f2419] text-white shadow-2xl shadow-[#0f2419]/10">
+      <div className="flex-1 overflow-y-auto pb-4">
         <div className="border-b border-white/10 p-6">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1d9e75] text-white">
@@ -76,7 +76,7 @@ const Sidebar = ({ sidebar, onFooterButtonClick }) => {
         </nav>
       </div>
 
-      <div className="p-6">
+      <div className="sticky bottom-0 mt-auto bg-[#0f2419] p-6">
         <button
           type="button"
           onClick={onFooterButtonClick || handleLogout}

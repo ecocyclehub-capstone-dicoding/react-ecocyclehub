@@ -1,109 +1,182 @@
-const formatNumber = (value) => Number(value || 0).toLocaleString("id-ID");
-const formatCurrency = (value) => `Rp ${formatNumber(value)}`;
-const formatDate = (value) =>
-  value
-    ? (() => {
-        const date = new Date(value);
-        return Number.isNaN(date.getTime())
-          ? "-"
-          : date.toLocaleDateString("id-ID", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            });
-      })()
-    : "-";
+import {
+  formatCurrency,
+  formatDate,
+  formatNumber,
+} from "@/shared/lib/formatters";
+import StatusBadge from "@/features/dashboard/components/common/StatusBadge";
+import {
+  getTransactionActorLabel,
+  getTransactionDetailPrice,
+  getTransactionPoints,
+} from "@/features/transaction/lib/transactionView";
 
-const TransactionTable = ({ data, onVerify }) => {
+const TransactionItems = ({ item }) => {
+  const details = item.details || [];
+
+  if (!details.length) {
+    return <span className="text-gray-400">-</span>;
+  }
+
+  return (
+    <div className="space-y-2">
+      {details.map((detail, index) => (
+        <div
+          key={`${item.id}-${detail.category}-${index}`}
+          className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-medium text-[#173c28]">
+              {detail.category || detail.category_id || "-"}
+            </span>
+            <span className="whitespace-nowrap text-xs font-medium text-gray-500">
+              {formatNumber(detail.weight)} kg
+            </span>
+          </div>
+          <div className="mt-1 text-xs text-gray-500">
+            {formatCurrency(getTransactionDetailPrice(detail))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const TransactionTable = ({
+  data = [],
+  onVerify,
+  verifyingId,
+  audience = "staff",
+}) => {
+  const showAction = typeof onVerify === "function";
+  const showStaffColumns = audience !== "customer";
+
+  if (!data.length) {
+    return (
+      <div className="rounded-2xl border border-dashed border-[#ded6ad] bg-white p-10 text-center text-sm font-medium text-gray-500 shadow-sm">
+        Tidak ada transaksi.
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto rounded-2xl border border-[#ded6ad] bg-white shadow-sm">
-      <table className="w-full min-w-[860px] text-sm">
+      <table
+        className={`w-full text-sm ${
+          showStaffColumns ? "min-w-[980px]" : "min-w-[760px]"
+        }`}
+      >
         <thead className="bg-[#f5f0e0] text-gray-500">
           <tr>
-            <th className="p-4 text-left font-semibold">Transaction ID</th>
-            <th className="p-4 text-left font-semibold">Date</th>
-            <th className="p-4 text-left font-semibold">Details</th>
-            <th className="p-4 text-left font-semibold">Weight</th>
-            <th className="p-4 text-left font-semibold">Points</th>
-            <th className="p-4 text-left font-semibold">Price</th>
-            <th className="p-4 text-left font-semibold">Status</th>
-            <th className="p-4 text-left font-semibold">Action</th>
+            <th className="w-24 p-4 text-left font-semibold">ID</th>
+            {showStaffColumns && (
+              <>
+                <th className="w-40 p-4 text-left font-semibold">Customer</th>
+                <th className="w-44 p-4 text-left font-semibold">Staff</th>
+              </>
+            )}
+            <th className="w-28 p-4 text-left font-semibold">Date</th>
+            <th className="p-4 text-left font-semibold">Items</th>
+            <th className="w-36 p-4 text-right font-semibold">Total</th>
+            <th className="w-32 p-4 text-center font-semibold">Status</th>
+            {showAction && (
+              <th className="w-28 p-4 text-center font-semibold">Action</th>
+            )}
           </tr>
         </thead>
 
         <tbody>
-          {data?.map((item) => (
-            <tr key={item.id} className="border-t border-gray-100">
-              <td className="p-4 font-mono text-xs text-gray-500">
-                {String(item.id).slice(0, 8)}
-              </td>
+          {data?.map((item) => {
+            const handledBy = getTransactionActorLabel(item, [
+              "handled_by",
+              "handler",
+              "handled_by_name",
+              "handled_by_id",
+            ]);
+            const verifiedBy = getTransactionActorLabel(item, [
+              "verified_by",
+              "verifier",
+              "verified_by_name",
+              "verified_by_id",
+            ]);
 
-              <td className="p-4 text-gray-600">
-                {formatDate(item.created_at)}
-              </td>
+            return (
+              <tr key={item.id} className="border-t border-gray-100">
+                <td className="p-4 align-middle font-mono text-xs text-gray-500">
+                  {String(item.id).slice(0, 8)}
+                </td>
 
-              <td className="p-4">
-                <div className="max-w-56 space-y-1">
-                  {(item.details || []).slice(0, 2).map((detail, index) => (
-                    <div key={`${item.id}-${detail.category}-${index}`}>
-                      <span className="font-medium text-[#173c28]">
-                        {detail.category}
-                      </span>
-                      <span className="text-gray-500">
-                        {" "}
-                        ({formatNumber(detail.weight)} kg)
-                      </span>
-                    </div>
-                  ))}
-                  {(item.details || []).length > 2 && (
-                    <div className="text-xs font-medium text-gray-500">
-                      +{item.details.length - 2} item lainnya
-                    </div>
-                  )}
-                  {!item.details?.length && (
-                    <span className="text-gray-400">-</span>
-                  )}
-                </div>
-              </td>
+                {showStaffColumns && (
+                  <>
+                    <td className="p-4 align-middle font-medium text-[#173c28]">
+                      {getTransactionActorLabel(item, [
+                        "user",
+                        "customer",
+                        "customer_name",
+                        "user_name",
+                        "user_id",
+                      ])}
+                    </td>
 
-              <td className="p-4">{formatNumber(item.total_weight)} kg</td>
-
-              <td className="p-4 font-semibold text-[#639922]">
-                +{formatNumber(item.total_points ?? item.total_point)} pts
-              </td>
-
-              <td className="p-4 font-medium">
-                {formatCurrency(item.total_price)}
-              </td>
-
-              <td className="p-4">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold
-                    ${
-                      item.status === "verified"
-                        ? "bg-green-100 text-green-700"
-                        : item.status === "pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-yellow-100 text-yellow-700"
-                    }
-                  `}
-                >
-                  {item.status}
-                </span>
-              </td>
-
-              <td className="p-4">
-                {item.status !== "verified" && (
-                  <button
-                    onClick={() => onVerify(item.id)}
-                    className="rounded-xl bg-[#1d9e75] px-4 py-2 text-sm font-semibold text-white"
-                  >
-                    Verify
-                  </button>
+                    <td className="p-4 align-middle">
+                      <div className="space-y-1 text-xs">
+                        <div>
+                          <span className="text-gray-400">Handled</span>
+                          <span className="ml-2 font-medium text-gray-700">
+                            {handledBy}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Verified</span>
+                          <span className="ml-2 font-medium text-gray-700">
+                            {verifiedBy}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </>
                 )}
-              </td>
-            </tr>
-          ))}
+
+                <td className="p-4 align-middle text-gray-600">
+                  {formatDate(item.created_at)}
+                </td>
+
+                <td className="p-4 align-middle">
+                  <TransactionItems item={item} />
+                </td>
+
+                <td className="p-4 align-middle text-right">
+                  <p className="font-semibold text-[#173c28]">
+                    {formatCurrency(item.total_price)}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {formatNumber(item.total_weight)} kg
+                  </p>
+                  <p className="mt-1 text-xs font-semibold text-[#639922]">
+                    +{formatNumber(getTransactionPoints(item))} pts
+                  </p>
+                </td>
+
+                <td className="p-4 align-middle text-center">
+                  <StatusBadge status={item.status} />
+                </td>
+
+                {showAction && (
+                  <td className="p-4 align-middle text-center">
+                    {item.status !== "verified" && (
+                      <button
+                        type="button"
+                        onClick={() => onVerify(item.id)}
+                        disabled={verifyingId === item.id}
+                        className="rounded-xl bg-[#1d9e75] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0f6e56] disabled:opacity-60"
+                      >
+                        {verifyingId === item.id ? "..." : "Verify"}
+                      </button>
+                    )}
+                  </td>
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

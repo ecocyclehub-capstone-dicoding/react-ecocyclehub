@@ -1,6 +1,11 @@
 import { axiosInstance } from "@/shared/api/axiosInstance";
 
 export const transactionApi = {
+  getHistory: async () => {
+    const res = await axiosInstance.get("/transactions/");
+    return res.data;
+  },
+
   getAll: async (params = {}) => {
     const res = await axiosInstance.get("/transactions/all/", { params });
     return res.data;
@@ -18,7 +23,7 @@ export const transactionApi = {
 
   verify: async (transactionId) => {
     const res = await axiosInstance.post(
-      `/transactions/${transactionId}/verify`,
+      `/transactions/${transactionId}/verify/`,
     );
 
     return res.data;

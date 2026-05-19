@@ -2,17 +2,31 @@ import { useCallback, useEffect, useState } from "react";
 import { dashboardApi } from "../api/dashboard.api";
 import { getApiErrorMessage } from "@/shared/lib/apiError";
 
-export const useAdminDashboard = () => {
+const dashboardRequest = {
+  admin: dashboardApi.getAdminDashboard,
+  officer: dashboardApi.getOfficerDashboard,
+  customer: dashboardApi.getCustomerDashboard,
+};
+
+export const useDashboard = (role) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const getDashboard = useCallback(async () => {
+    const request = dashboardRequest[role];
+
+    if (!request) {
+      setLoading(false);
+      setError("Invalid dashboard role");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
-      const res = await dashboardApi.getAdminDashboard();
+      const res = await request();
 
       setData(res.data);
     } catch (err) {
@@ -20,7 +34,7 @@ export const useAdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [role]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
