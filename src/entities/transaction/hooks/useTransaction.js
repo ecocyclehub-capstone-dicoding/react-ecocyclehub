@@ -28,6 +28,22 @@ export const useTransaction = () => {
     }
   }, []);
 
+  const getTransactionHistory = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const res = await transactionApi.getHistory();
+
+      setTransactions(res.data || []);
+      setPagination(res.pagination || null);
+      setError(null);
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to fetch transaction history"));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const createTransaction = async (payload) => {
     try {
       setLoading(true);
@@ -84,6 +100,7 @@ export const useTransaction = () => {
     error,
     fieldErrors,
     getTransactions,
+    getTransactionHistory,
     createTransaction,
     verifyTransaction,
   };
