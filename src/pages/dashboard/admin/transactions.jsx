@@ -4,20 +4,16 @@ import { adminSidebar } from "@/features/dashboard/components/configs/admin.conf
 import TransactionTable from "@/features/transaction/components/TransactionTable";
 import Pagination from "@/shared/components/Pagination";
 import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
-
-const PAGE_SIZE = 10;
-const STATUS_OPTIONS = [
-  { label: "Semua Status", value: "" },
-  { label: "Pending", value: "pending" },
-  { label: "Verified", value: "verified" },
-  { label: "Completed", value: "completed" },
-];
+import {
+  TRANSACTION_PAGE_SIZE,
+  TRANSACTION_STATUS_OPTIONS,
+} from "@/features/transaction/lib/transactionConstants";
 
 const AdminTransactionsPage = () => {
   const {
     transactions,
     pagination,
-    loading,
+    isFetching,
     error,
     getTransactions,
     verifyTransaction,
@@ -28,7 +24,7 @@ const AdminTransactionsPage = () => {
   useEffect(() => {
     getTransactions({
       page,
-      page_size: PAGE_SIZE,
+      page_size: TRANSACTION_PAGE_SIZE,
       ...(status ? { status } : {}),
     });
   }, [getTransactions, page, status]);
@@ -37,7 +33,7 @@ const AdminTransactionsPage = () => {
     await verifyTransaction(id);
     await getTransactions({
       page,
-      page_size: PAGE_SIZE,
+      page_size: TRANSACTION_PAGE_SIZE,
       ...(status ? { status } : {}),
     });
   };
@@ -74,7 +70,7 @@ const AdminTransactionsPage = () => {
             onChange={handleStatusChange}
             className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-[#173c28] outline-none focus:border-[#14532d]"
           >
-            {STATUS_OPTIONS.map((option) => (
+            {TRANSACTION_STATUS_OPTIONS.map((option) => (
               <option key={option.label} value={option.value}>
                 {option.label}
               </option>
@@ -82,10 +78,10 @@ const AdminTransactionsPage = () => {
           </select>
         </div>
 
-        {loading && <div>Loading...</div>}
+        {isFetching && <div>Loading...</div>}
         {error && <div className="text-red-500">{error}</div>}
 
-        {!loading && !error && (
+        {!isFetching && !error && (
           <>
             {transactions.length === 0 ? (
               <div className="text-gray-500 text-center py-8">

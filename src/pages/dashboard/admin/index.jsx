@@ -1,8 +1,7 @@
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 import StatCard from "@/features/dashboard/components/cards/StatCard";
-import SectionWrapper from "@/features/dashboard/components/common/SectionWrapper";
 import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
-import { useAdminDashboard } from "@/entities/dashboard/hooks/useAdminDashboard";
+import { useDashboard } from "@/entities/dashboard/hooks/useDashboard";
 import {
   HiUsers,
   HiDocumentText,
@@ -12,7 +11,7 @@ import {
 } from "react-icons/hi2";
 
 const AdminDashboardPage = () => {
-  const { data, loading, error } = useAdminDashboard();
+  const { data, loading, error } = useDashboard("admin");
   const dashboard = {
     total_users: data?.total_users ?? 0,
     total_transactions: data?.total_transactions ?? 0,
