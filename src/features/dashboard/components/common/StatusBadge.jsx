@@ -2,15 +2,11 @@ const StatusBadge = ({ status }) => {
   const styles = {
     verified: "border-[#97c459] bg-[#eaf3de] text-[#3b6d11]",
     pending: "border-[#ef9f27] bg-[#faeeda] text-[#854f0b]",
-    completed: "border-[#85b7eb] bg-[#e6f1fb] text-[#185fa5]",
-    processed: "border-[#85b7eb] bg-[#e6f1fb] text-[#185fa5]",
   };
 
   const labels = {
     verified: "Terverifikasi",
     pending: "Menunggu",
-    completed: "Diproses",
-    processed: "Diproses",
   };
 
   const normalizedStatus =

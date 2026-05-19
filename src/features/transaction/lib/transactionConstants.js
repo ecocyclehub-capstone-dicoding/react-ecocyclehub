@@ -4,5 +4,4 @@ export const TRANSACTION_STATUS_OPTIONS = [
   { label: "Semua Status", value: "" },
   { label: "Pending", value: "pending" },
   { label: "Verified", value: "verified" },
-  { label: "Completed", value: "completed" },
 ];
