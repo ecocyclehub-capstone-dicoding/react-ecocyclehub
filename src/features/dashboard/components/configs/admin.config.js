@@ -38,5 +38,10 @@ export const adminSidebar = {
       icon: MdEmojiEvents,
       path: "/admin/levels",
     },
+    {
+      label: "Papan Peringkat",
+      icon: MdEmojiEvents,
+      path: "/admin/leaderboard",
+    },
   ],
 };

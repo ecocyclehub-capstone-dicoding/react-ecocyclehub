@@ -28,4 +28,12 @@ export const transactionApi = {
 
     return res.data;
   },
+
+  reject: async (transactionId) => {
+    const res = await axiosInstance.post(
+      `/transactions/${transactionId}/reject/`,
+    );
+
+    return res.data;
+  },
 };

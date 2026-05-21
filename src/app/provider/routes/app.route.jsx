@@ -18,6 +18,9 @@ const OfficerTransactionsPage = lazy(
 const OfficerCategoriesPage = lazy(
   () => import("@/pages/dashboard/officer/categories"),
 );
+const OfficerLeaderboardPage = lazy(
+  () => import("@/pages/dashboard/officer/leaderboard"),
+);
 const CustomerDashboardPage = lazy(() => import("@/pages/dashboard/customer"));
 const CustomerTransactionsPage = lazy(
   () => import("@/pages/dashboard/customer/transactions"),
@@ -35,6 +38,9 @@ const AdminTransactionsPage = lazy(
 
 const AdminCategoriesPage = lazy(
   () => import("@/pages/dashboard/admin/categories"),
+);
+const AdminLeaderboardPage = lazy(
+  () => import("@/pages/dashboard/admin/leaderboard"),
 );
 
 const PageLoader = () => (
@@ -113,6 +119,10 @@ export const router = createBrowserRouter([
         path: "levels",
         element: wrap(AdminLevelsPage),
       },
+      {
+        path: "leaderboard",
+        element: wrap(AdminLeaderboardPage),
+      },
     ],
   },
 
@@ -143,6 +153,10 @@ export const router = createBrowserRouter([
       {
         path: "categories",
         element: wrap(OfficerCategoriesPage),
+      },
+      {
+        path: "leaderboard",
+        element: wrap(OfficerLeaderboardPage),
       },
     ],
   },

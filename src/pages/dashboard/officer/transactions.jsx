@@ -16,6 +16,8 @@ import {
   TRANSACTION_STATUS_OPTIONS,
 } from "@/features/transaction/lib/transactionConstants";
 
+const PAGE_SIZE = 5;
+
 const OfficerTransactionsPage = () => {
   const {
     transactions,
@@ -27,15 +29,27 @@ const OfficerTransactionsPage = () => {
     getTransactions,
     createTransaction,
     verifyTransaction,
+    rejectTransaction,
   } = useTransaction();
+
+  const {
+    transactions: historyTransactions,
+    pagination: historyPagination,
+    isFetching: historyLoading,
+    error: historyError,
+    getTransactions: getHistoryTransactions,
+  } = useTransaction();
+
   const { categories } = useCategory();
   const { users } = useUser();
   const { feedback, showFeedback, closeFeedback } = useFeedbackModal();
 
+  const [historyPage, setHistoryPage] = useState(1);
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("pending");
   const [modalOpen, setModalOpen] = useState(false);
   const [verifyingId, setVerifyingId] = useState(null);
+  const [rejectingId, setRejectingId] = useState(null);
 
   const params = useMemo(
     () => ({
@@ -55,6 +69,13 @@ const OfficerTransactionsPage = () => {
     getTransactions(params);
   }, [getTransactions, params]);
 
+  useEffect(() => {
+    getHistoryTransactions({
+      page: historyPage,
+      page_size: PAGE_SIZE,
+    });
+  }, [getHistoryTransactions, historyPage]);
+
   const handleStatusChange = (event) => {
     setStatus(event.target.value);
     setPage(1);
@@ -71,9 +92,38 @@ const OfficerTransactionsPage = () => {
       setVerifyingId(id);
       await verifyTransaction(id);
       await getTransactions(params);
+
+      await getHistoryTransactions({
+        page: historyPage,
+        page_size: PAGE_SIZE,
+      });
+
       showFeedback("Transaksi Diverifikasi", "Status transaksi diperbarui.");
-    } finally {
+    } catch {
+      // Error state is handled inside useTransaction
+} finally {
       setVerifyingId(null);
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      setRejectingId(id);
+      await rejectTransaction(id);
+      await getTransactions(params);
+      await getHistoryTransactions({
+        page: historyPage,
+        page_size: PAGE_SIZE,
+      });
+
+      showFeedback(
+        "Transaksi Ditolak",
+        "Status transaksi berhasil diperbarui.",
+      );
+    } catch {
+      // Error state is handled inside useTransaction
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -140,7 +190,9 @@ const OfficerTransactionsPage = () => {
             <TransactionTable
               data={transactions}
               onVerify={handleVerify}
+              onReject={handleReject}
               verifyingId={verifyingId}
+              rejectingId={rejectingId}
             />
 
             <Pagination
@@ -168,6 +220,43 @@ const OfficerTransactionsPage = () => {
         message={feedback.message}
         onClose={closeFeedback}
       />
+
+      {/* History Transactions */}
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-bold text-[#0d4f2c]">
+            Riwayat Semua Transaksi
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Semua transaksi dari seluruh status.
+          </p>
+        </div>
+
+        {historyError && (
+          <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
+            {historyError}
+          </div>
+        )}
+
+        {historyLoading ? (
+          <div className="rounded-2xl bg-white p-6 text-sm font-medium text-gray-500 shadow-sm">
+            Loading...
+          </div>
+        ) : (
+          !historyError && (
+            <>
+              <TransactionTable data={historyTransactions} />
+
+              <Pagination
+                page={historyPage}
+                totalPages={historyPagination?.total_pages || 1}
+                onPageChange={setHistoryPage}
+              />
+            </>
+          )
+        )}
+      </section>
     </DashboardLayout>
   );
 };

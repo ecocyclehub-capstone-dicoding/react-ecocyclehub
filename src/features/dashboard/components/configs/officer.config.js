@@ -2,6 +2,7 @@ import {
   MdDashboard,
   MdSwapHoriz,
   MdCategory,
+  MdEmojiEvents,
 } from "react-icons/md";
 
 export const officerSidebar = {
@@ -24,6 +25,11 @@ export const officerSidebar = {
       label: "Kategori Sampah",
       icon: MdCategory,
       path: "/officer/categories",
+    },
+    {
+      label: "Papan Peringkat",
+      icon: MdEmojiEvents,
+      path: "/officer/leaderboard",
     },
   ],
 };
