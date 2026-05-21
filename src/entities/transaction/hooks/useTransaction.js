@@ -1,5 +1,7 @@
 import { useCallback, useState } from "react";
+
 import { transactionApi } from "../api/transaction.api";
+
 import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useTransaction = () => {
@@ -16,12 +18,12 @@ export const useTransaction = () => {
   const getTransactions = useCallback(async (params = {}) => {
     try {
       setIsFetching(true);
+      setError(null);
 
       const res = await transactionApi.getAll(params);
 
       setTransactions(res.data || []);
       setPagination(res.pagination || null);
-      setError(null);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to fetch transactions"));
     } finally {
@@ -32,12 +34,12 @@ export const useTransaction = () => {
   const getTransactionHistory = useCallback(async () => {
     try {
       setIsFetching(true);
+      setError(null);
 
       const res = await transactionApi.getHistory();
 
       setTransactions(res.data || []);
       setPagination(res.pagination || null);
-      setError(null);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to fetch transaction history"));
     } finally {
@@ -74,6 +76,7 @@ export const useTransaction = () => {
   const verifyTransaction = async (id) => {
     try {
       setIsMutating(true);
+      setError(null);
 
       const res = await transactionApi.verify(id);
 
@@ -98,19 +101,53 @@ export const useTransaction = () => {
     }
   };
 
+  const rejectTransaction = async (id) => {
+    try {
+      setIsMutating(true);
+      setError(null);
+
+      const res = await transactionApi.reject(id);
+
+      setTransactions((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                status: "rejected",
+              }
+            : item,
+        ),
+      );
+
+      return res;
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Failed to reject transaction"));
+
+      throw err;
+    } finally {
+      setIsMutating(false);
+    }
+  };
+
   const loading = isFetching || isMutating;
 
   return {
     transactions,
     pagination,
+
     loading,
     isFetching,
     isMutating,
+
     error,
     fieldErrors,
+
     getTransactions,
     getTransactionHistory,
+
     createTransaction,
+
     verifyTransaction,
+    rejectTransaction,
   };
 };
