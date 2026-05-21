@@ -29,11 +29,12 @@ const OfficerDashboardPage = () => {
     error: transactionsError,
     getTransactions,
     verifyTransaction,
+    rejectTransaction,
   } = useTransaction();
 
   const [pendingPage, setPendingPage] = useState(1);
-
   const [verifyingId, setVerifyingId] = useState(null);
+  const [rejectingId, setRejectingId] = useState(null);
 
   useEffect(() => {
     getTransactions({
@@ -60,8 +61,26 @@ const OfficerDashboardPage = () => {
         page: pendingPage,
         page_size: PAGE_SIZE,
       });
+    } catch {
+      // Error state is handled inside useTransaction
     } finally {
       setVerifyingId(null);
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      setRejectingId(id);
+      await rejectTransaction(id);
+      await getTransactions({
+        status: "pending",
+        page: pendingPage,
+        page_size: PAGE_SIZE,
+      });
+    } catch {
+      // Error state is handled inside useTransaction
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -131,7 +150,9 @@ const OfficerDashboardPage = () => {
                 <TransactionTable
                   data={transactions}
                   onVerify={handleVerify}
+                  onReject={handleReject}
                   verifyingId={verifyingId}
+                  rejectingId={rejectingId}
                 />
 
                 <Pagination

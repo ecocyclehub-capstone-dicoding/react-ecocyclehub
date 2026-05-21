@@ -99,7 +99,9 @@ const OfficerTransactionsPage = () => {
       });
 
       showFeedback("Transaksi Diverifikasi", "Status transaksi diperbarui.");
-    } finally {
+    } catch {
+      // Error state is handled inside useTransaction
+} finally {
       setVerifyingId(null);
     }
   };
@@ -109,11 +111,17 @@ const OfficerTransactionsPage = () => {
       setRejectingId(id);
       await rejectTransaction(id);
       await getTransactions(params);
+      await getHistoryTransactions({
+        page: historyPage,
+        page_size: PAGE_SIZE,
+      });
 
       showFeedback(
         "Transaksi Ditolak",
         "Status transaksi berhasil diperbarui.",
       );
+    } catch {
+      // Error state is handled inside useTransaction
     } finally {
       setRejectingId(null);
     }
