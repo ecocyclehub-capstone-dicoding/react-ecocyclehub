@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 
-import { customerSidebar } from "@/features/dashboard/components/configs/customer.config";
+import { officerSidebar } from "@/features/dashboard/components/configs/officer.config";
 
 import StatusBadge from "@/features/dashboard/components/common/StatusBadge";
 
@@ -12,12 +12,12 @@ import { formatNumber } from "@/shared/lib/formatters";
 
 const medals = ["🥇", "🥈", "🥉"];
 
-const CustomerLeaderboardPage = () => {
+const AdminLeaderboardPage = () => {
   const { leaderboard, isFetching, error } = useLeaderboard(10);
 
   return (
     <DashboardLayout
-      sidebar={customerSidebar}
+      sidebar={officerSidebar}
       title="Papan Peringkat"
       subtitle="Bandingkan kontribusi poin dengan nasabah lain."
     >
@@ -96,4 +96,4 @@ const CustomerLeaderboardPage = () => {
   );
 };
 
-export default CustomerLeaderboardPage;
+export default AdminLeaderboardPage;
