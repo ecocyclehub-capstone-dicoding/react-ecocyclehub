@@ -1,105 +1,102 @@
-import React from "react";
 import { useState } from "react";
 
-const LoginForm = ({ onSubmit, loading = false }) => {
+const LoginForm = ({ onSubmit, loading, error, fieldErrors }) => {
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (loading) {
-      return;
-    }
+    if (loading) return;
 
-    if (!form.email || !form.password) {
-      alert("Email dan password wajib diisi");
-      return;
-    }
-
-    onSubmit?.(form);
+    onSubmit({
+      email: form.email.trim(),
+      password: form.password,
+    });
   };
+
+  const hasFieldErrors = Object.keys(fieldErrors || {}).length > 0;
 
   return (
     <div className="w-full max-w-md bg-[#f5f5f3] p-10 rounded-3xl shadow-lg">
-      {/* Title */}
-      <h2 className="text-3xl font-semibold text-[#1f1f1f] mb-2">
-        Welcome Back
-      </h2>
-      <p className="text-sm text-gray-500 mb-8">
+      <h2 className="text-3xl font-semibold mb-2">Welcome Back</h2>
+
+      <p className="text-sm text-gray-500 mb-6">
         Enter your credentials to access the hub.
       </p>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Email */}
+      {/* GLOBAL ERROR */}
+      {!hasFieldErrors && error && (
+        <div className="mb-4 text-sm text-red-600 bg-red-100 p-3 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate className="space-y-6">
+        {/* EMAIL */}
         <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium mb-2 text-gray-700"
-          >
+          <label className="block text-sm mb-2 text-gray-700">
             Email Address
           </label>
-          <div className="flex items-center bg-[#d6cfa3] rounded-xl px-4 py-3">
+
+          <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
               type="email"
               name="email"
+              autoComplete="email"
               placeholder="name@company.com"
               value={form.email}
               onChange={handleChange}
-              className="bg-transparent outline-none w-full text-sm text-gray-800 placeholder-gray-600"
+              className="bg-transparent outline-none w-full text-sm"
             />
           </div>
+
+          {fieldErrors?.email && (
+            <p className="text-xs text-red-500 mt-1">{fieldErrors.email[0]}</p>
+          )}
         </div>
 
-        {/* Password */}
+        {/* PASSWORD */}
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <span className="text-xs text-green-700 cursor-pointer">
-              Forgot?
-            </span>
-          </div>
+          <label className="block text-sm mb-2 text-gray-700">Password</label>
 
-          <div className="flex items-center bg-[#d6cfa3] rounded-xl px-4 py-3">
+          <div className="bg-[#d6cfa3] rounded-xl px-4 py-3">
             <input
-              id="password"
               type="password"
               name="password"
+              autoComplete="current-password"
               placeholder="********"
               value={form.password}
               onChange={handleChange}
-              className="bg-transparent outline-none w-full text-sm text-gray-800"
+              className="bg-transparent outline-none w-full text-sm"
             />
           </div>
+
+          {fieldErrors?.password && (
+            <p className="text-xs text-red-500 mt-1">
+              {fieldErrors.password[0]}
+            </p>
+          )}
         </div>
 
-        {/* Remember */}
-        <div className="flex items-center gap-2">
-          <input type="checkbox" className="w-4 h-4 accent-green-700" />
-          <span className="text-sm text-gray-600">Remember this device</span>
-        </div>
-
-        {/* Button */}
+        {/* BUTTON */}
         <button
           type="submit"
-          className="w-full py-4 rounded-xl text-white font-medium transition bg-gradient-to-r from-green-800 to-green-600 hover:opacity-90"
+          disabled={loading}
+          className="w-full py-4 rounded-xl text-white bg-gradient-to-r from-green-800 to-green-600 disabled:opacity-60"
         >
-          {loading ? "Loading..." : "Sign In to Hub →"}
+          {loading ? "Signing in..." : "Sign In →"}
         </button>
       </form>
     </div>

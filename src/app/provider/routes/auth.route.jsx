@@ -1,16 +1,26 @@
 import React from "react";
-import LoginPage from "../../../pages/login";
-import RegisterPage from "../../../pages/register";
 
-const authRoutes = [
+import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
+
+import PublicRoute from "./PublicRoute";
+
+export const authRoutes = [
   {
-    path: "/",
-    element: <LoginPage />,
+    path: "/login",
+    element: (
+      <PublicRoute>
+        <LoginPage />
+      </PublicRoute>
+    ),
   },
+
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: (
+      <PublicRoute>
+        <RegisterPage />
+      </PublicRoute>
+    ),
   },
 ];
-
-export default authRoutes;

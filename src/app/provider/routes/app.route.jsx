@@ -1,11 +1,200 @@
-import React from "react";
-import DashboardPage from "@/pages/dashboard";
+/* eslint-disable react-refresh/only-export-components */
+import React, { lazy, Suspense } from "react";
+import { MdRecycling } from "react-icons/md";
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import { authRoutes } from "./auth.route";
+import { notFoundRoutes } from "./not-found.route";
+import ProtectedRoute from "./ProtectedRoute";
+import NotFoundPage from "@/pages/not-found";
 
-const appRoutes = [
+const DashboardRedirectPage = lazy(() => import("@/pages/dashboard"));
+const AdminDashboardPage = lazy(() => import("@/pages/dashboard/admin"));
+const AdminUsersPage = lazy(() => import("@/pages/dashboard/admin/users"));
+const AdminLevelsPage = lazy(() => import("@/pages/dashboard/admin/levels"));
+const OfficerDashboardPage = lazy(() => import("@/pages/dashboard/officer"));
+const OfficerTransactionsPage = lazy(
+  () => import("@/pages/dashboard/officer/transactions"),
+);
+const OfficerCategoriesPage = lazy(
+  () => import("@/pages/dashboard/officer/categories"),
+);
+const OfficerLeaderboardPage = lazy(
+  () => import("@/pages/dashboard/officer/leaderboard"),
+);
+const CustomerDashboardPage = lazy(() => import("@/pages/dashboard/customer"));
+const CustomerTransactionsPage = lazy(
+  () => import("@/pages/dashboard/customer/transactions"),
+);
+const CustomerCategoriesPage = lazy(
+  () => import("@/pages/dashboard/customer/categories"),
+);
+const CustomerLeaderboardPage = lazy(
+  () => import("@/pages/dashboard/customer/leaderboard"),
+);
+
+const AdminTransactionsPage = lazy(
+  () => import("@/pages/dashboard/admin/transactions"),
+);
+
+const AdminCategoriesPage = lazy(
+  () => import("@/pages/dashboard/admin/categories"),
+);
+const AdminLeaderboardPage = lazy(
+  () => import("@/pages/dashboard/admin/leaderboard"),
+);
+
+const PageLoader = () => (
+  <div className="flex min-h-screen items-center justify-center bg-[#f5f0e0]">
+    <MdRecycling size={40} className="animate-spin text-green-700" />
+  </div>
+);
+
+const wrap = (Component) => (
+  <Suspense fallback={<PageLoader />}>
+    {React.createElement(Component)}
+  </Suspense>
+);
+
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Navigate to="/login" replace />,
+    errorElement: <NotFoundPage />,
+  },
+
+  ...authRoutes,
+
+  /*
+   |--------------------------------------------------------------------------
+   | DASHBOARD REDIRECT
+   |--------------------------------------------------------------------------
+   */
+
   {
     path: "/dashboard",
-    element: <DashboardPage />,
-  },
-];
+    element: <ProtectedRoute allowedRoles={["admin", "officer", "customer"]} />,
+    errorElement: <NotFoundPage />,
 
-export default appRoutes;
+    children: [
+      {
+        index: true,
+        element: wrap(DashboardRedirectPage),
+      },
+    ],
+  },
+
+  /*
+   |--------------------------------------------------------------------------
+   | ADMIN
+   |--------------------------------------------------------------------------
+   */
+
+  {
+    path: "/admin",
+    element: <ProtectedRoute allowedRoles={["admin"]} />,
+    errorElement: <NotFoundPage />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="dashboard" replace />,
+      },
+      {
+        path: "dashboard",
+        element: wrap(AdminDashboardPage),
+      },
+
+      {
+        path: "users",
+        element: wrap(AdminUsersPage),
+      },
+      {
+        path: "transactions",
+        element: wrap(AdminTransactionsPage),
+      },
+      {
+        path: "categories",
+        element: wrap(AdminCategoriesPage),
+      },
+      {
+        path: "levels",
+        element: wrap(AdminLevelsPage),
+      },
+      {
+        path: "leaderboard",
+        element: wrap(AdminLeaderboardPage),
+      },
+    ],
+  },
+
+  /*
+   |--------------------------------------------------------------------------
+   | OFFICER
+   |--------------------------------------------------------------------------
+   */
+
+  {
+    path: "/officer",
+    element: <ProtectedRoute allowedRoles={["officer"]} />,
+    errorElement: <NotFoundPage />,
+
+    children: [
+      {
+        index: true,
+        element: <Navigate to="dashboard" replace />,
+      },
+      {
+        path: "dashboard",
+        element: wrap(OfficerDashboardPage),
+      },
+      {
+        path: "transactions",
+        element: wrap(OfficerTransactionsPage),
+      },
+      {
+        path: "categories",
+        element: wrap(OfficerCategoriesPage),
+      },
+      {
+        path: "leaderboard",
+        element: wrap(OfficerLeaderboardPage),
+      },
+    ],
+  },
+
+  /*
+   |--------------------------------------------------------------------------
+   | CUSTOMER
+   |--------------------------------------------------------------------------
+   */
+
+  {
+    path: "/customer",
+    element: <ProtectedRoute allowedRoles={["customer"]} />,
+    errorElement: <NotFoundPage />,
+
+    children: [
+      {
+        index: true,
+        element: <Navigate to="dashboard" replace />,
+      },
+      {
+        path: "dashboard",
+        element: wrap(CustomerDashboardPage),
+      },
+      {
+        path: "transactions",
+        element: wrap(CustomerTransactionsPage),
+      },
+      {
+        path: "categories",
+        element: wrap(CustomerCategoriesPage),
+      },
+      {
+        path: "leaderboard",
+        element: wrap(CustomerLeaderboardPage),
+      },
+    ],
+  },
+
+  notFoundRoutes,
+]);

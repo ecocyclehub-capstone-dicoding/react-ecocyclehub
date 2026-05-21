@@ -1,0 +1,170 @@
+import { useState } from "react";
+import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
+import { adminSidebar } from "@/features/dashboard/components/configs/admin.config";
+
+import CategoryTable from "@/features/category/components/CategoryTable";
+import CategoryModal from "@/features/category/components/CategoryModal";
+import DeleteConfirmModal from "@/shared/components/DeleteConfirmModal";
+import SuccessModal from "@/shared/components/SuccessModal";
+import Pagination from "@/shared/components/Pagination";
+import { useFeedbackModal } from "@/shared/hooks/useFeedbackModal";
+
+import { useCategory } from "@/entities/category/hooks/useCategory";
+
+const PAGE_SIZE = 6;
+
+const AdminCategoriesPage = () => {
+  const {
+    categories,
+    isMutating,
+    isFetching,
+    error,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+  } = useCategory();
+
+  const [page, setPage] = useState(1);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const { feedback, showFeedback, closeFeedback } = useFeedbackModal();
+
+  const totalPages = Math.ceil(categories.length / PAGE_SIZE);
+  const currentPage = Math.min(page, totalPages || 1);
+
+  const paginatedCategories = categories.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
+  const handleSubmit = async (payload) => {
+    try {
+      const isEdit = !!selectedCategory;
+
+      if (isEdit) {
+        await updateCategory(selectedCategory.id, payload);
+        showFeedback("Category Updated", "Category updated successfully");
+      } else {
+        await createCategory(payload);
+        showFeedback("Category Created", "Category created successfully");
+      }
+
+      setOpenModal(false);
+      setSelectedCategory(null);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to save category");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteCategory(id);
+
+      setOpenDeleteModal(false);
+      setSelectedCategory(null);
+
+      showFeedback("Category Deleted", "Category deleted successfully");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete category");
+    }
+  };
+
+  return (
+    <DashboardLayout
+      sidebar={adminSidebar}
+      title="Kategori Sampah"
+      subtitle="Kelola katalog, harga per kilogram, dan poin untuk setiap jenis sampah."
+    >
+      <div className="space-y-6">
+        {/* HEADER */}
+        <div className="flex flex-col gap-4 rounded-2xl border border-[#ded6ad] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-[#639922]">
+              Total kategori aktif
+            </p>
+            <h1 className="mt-1 text-3xl font-bold text-[#0d4f2c]">
+              {categories.length} Kategori
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm text-gray-500">
+              Atur harga dan poin yang digunakan petugas saat membuat transaksi
+              setoran sampah.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setOpenModal(true)}
+            className="rounded-2xl bg-[#14532d] px-6 py-3 font-semibold text-white transition hover:bg-[#0f3d22]"
+          >
+            + Tambah Kategori
+          </button>
+        </div>
+
+        {/* LOADING */}
+        {isFetching && <div>Loading...</div>}
+
+        {/* ERROR */}
+        {error && <div className="text-red-500">{error}</div>}
+
+        {/* TABLE */}
+        {!isFetching && !error && (
+          <>
+            <CategoryTable
+              data={paginatedCategories}
+              onEdit={(c) => {
+                setSelectedCategory(c);
+                setOpenModal(true);
+              }}
+              onDelete={(c) => {
+                setSelectedCategory(c);
+                setOpenDeleteModal(true);
+              }}
+            />
+
+            <Pagination
+              page={currentPage}
+              totalPages={totalPages}
+              onPageChange={setPage}
+            />
+          </>
+        )}
+
+        <CategoryModal
+          open={openModal}
+          selectedCategory={selectedCategory}
+          loading={isMutating}
+          onClose={() => {
+            setOpenModal(false);
+            setSelectedCategory(null);
+          }}
+          onSubmit={handleSubmit}
+        />
+
+        <DeleteConfirmModal
+          open={openDeleteModal}
+          item={selectedCategory}
+          title="Delete Category"
+          itemLabel="category"
+          confirmText="Delete Category"
+          loading={isMutating}
+          onClose={() => {
+            setOpenDeleteModal(false);
+            setSelectedCategory(null);
+          }}
+          onConfirm={handleDelete}
+        />
+
+        <SuccessModal
+          open={feedback.open}
+          title={feedback.title}
+          message={feedback.message}
+          onClose={closeFeedback}
+        />
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default AdminCategoriesPage;
