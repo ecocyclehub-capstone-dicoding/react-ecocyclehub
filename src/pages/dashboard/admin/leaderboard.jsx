@@ -21,7 +21,7 @@ const AdminLeaderboardPage = () => {
       title="Papan Peringkat"
       subtitle="Bandingkan kontribusi poin dengan nasabah lain."
     >
-      <div className="overflow-hidden rounded-2xl border border-[#ded6ad] bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-2xl border border-[#ded6ad] bg-white shadow-sm">
         <table className="w-full min-w-[620px] text-sm">
           <thead className="bg-[#f5f0e0] text-left text-gray-500">
             <tr>

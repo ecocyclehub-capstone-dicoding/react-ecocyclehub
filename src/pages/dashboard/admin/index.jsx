@@ -66,6 +66,8 @@ const AdminDashboardPage = () => {
       await verifyTransaction(id);
 
       await refreshTransactions();
+    } catch {
+      // Error state is handled inside useTransaction
     } finally {
       setVerifyingId(null);
     }
@@ -78,6 +80,8 @@ const AdminDashboardPage = () => {
       await rejectTransaction(id);
 
       await refreshTransactions();
+    } catch {
+      // Error state is handled inside useTransaction
     } finally {
       setRejectingId(null);
     }
