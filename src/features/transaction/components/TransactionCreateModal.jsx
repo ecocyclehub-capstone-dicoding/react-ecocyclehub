@@ -1,13 +1,15 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MdAdd, MdClose } from "react-icons/md";
+
 import FormField from "@/shared/components/FormField";
 import ModalShell from "@/shared/components/ModalShell";
+
 import { formatCurrency, formatNumber } from "@/shared/lib/formatters";
 
-const emptyForm = {
+const createEmptyForm = (isCustomer = false) => ({
   user_id: "",
   items: [{ category_id: "", weight: "" }],
-};
+});
 
 const getFirstError = (errors, field) => {
   const value = errors?.[field];
@@ -17,6 +19,7 @@ const getFirstError = (errors, field) => {
 
 const TransactionCreateModal = ({
   open,
+  audience = "officer",
   customers = [],
   categories = [],
   fieldErrors = {},
@@ -24,7 +27,15 @@ const TransactionCreateModal = ({
   onClose,
   onSubmit,
 }) => {
-  const [form, setForm] = useState(emptyForm);
+  const isCustomer = audience === "customer";
+
+  const [form, setForm] = useState(createEmptyForm(isCustomer));
+
+  useEffect(() => {
+    if (open) {
+      setForm(createEmptyForm(isCustomer));
+    }
+  }, [open, isCustomer]);
 
   const estimate = useMemo(
     () =>
@@ -33,18 +44,24 @@ const TransactionCreateModal = ({
           const category = categories.find(
             (categoryItem) => categoryItem.id === item.category_id,
           );
+
           const weight = Number(item.weight || 0);
 
-          if (!category || weight <= 0) return summary;
+          if (!category || weight <= 0) {
+            return summary;
+          }
 
           return {
-            price:
-              summary.price + Number(category.price_per_kg || 0) * weight,
+            price: summary.price + Number(category.price_per_kg || 0) * weight,
+
             points:
               summary.points + Number(category.point_per_kg || 0) * weight,
           };
         },
-        { price: 0, points: 0 },
+        {
+          price: 0,
+          points: 0,
+        },
       ),
     [categories, form.items],
   );
@@ -62,7 +79,12 @@ const TransactionCreateModal = ({
     setForm((current) => ({
       ...current,
       items: current.items.map((item, itemIndex) =>
-        itemIndex === index ? { ...item, [field]: value } : item,
+        itemIndex === index
+          ? {
+              ...item,
+              [field]: value,
+            }
+          : item,
       ),
     }));
   };
@@ -70,7 +92,13 @@ const TransactionCreateModal = ({
   const addItem = () => {
     setForm((current) => ({
       ...current,
-      items: [...current.items, { category_id: "", weight: "" }],
+      items: [
+        ...current.items,
+        {
+          category_id: "",
+          weight: "",
+        },
+      ],
     }));
   };
 
@@ -84,54 +112,69 @@ const TransactionCreateModal = ({
   const getItemError = (index, field) => {
     const nestedError = fieldErrors?.items?.[index]?.[field];
 
-    if (Array.isArray(nestedError)) return nestedError[0];
+    if (Array.isArray(nestedError)) {
+      return nestedError[0];
+    }
 
     return nestedError;
   };
 
   const handleClose = () => {
-    setForm(emptyForm);
+    setForm(createEmptyForm(isCustomer));
+
     onClose?.();
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    await onSubmit({
-      ...(form.user_id ? { user_id: form.user_id } : {}),
+    const payload = {
       items: form.items.map((item) => ({
         category_id: item.category_id,
         weight: Number(item.weight),
       })),
-    });
+    };
 
-    setForm(emptyForm);
+    if (!isCustomer && form.user_id) {
+      payload.user_id = form.user_id;
+    }
+
+    await onSubmit(payload);
+
+    setForm(createEmptyForm(isCustomer));
   };
 
   return (
     <ModalShell
       open={open}
-      title="Buat Transaksi Baru"
-      description="Tambahkan satu atau beberapa kategori sampah beserta beratnya."
+      title={isCustomer ? "Buat Setoran Sampah" : "Buat Transaksi Baru"}
+      description={
+        isCustomer
+          ? "Tambahkan jenis sampah dan berat setoran."
+          : "Tambahkan satu atau beberapa kategori sampah beserta beratnya."
+      }
       onClose={handleClose}
       showCloseButton
       panelClassName="w-full max-w-xl rounded-3xl bg-white p-8 shadow-2xl"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        <FormField
-          label="Nasabah"
-          name="user_id"
-          value={form.user_id}
-          onChange={updateField}
-          error={getFirstError(fieldErrors, "user_id")}
-        >
-          <option value="">Pilih nasabah...</option>
-          {customers.map((customer) => (
-            <option key={customer.id} value={customer.id}>
-              {customer.name}
-            </option>
-          ))}
-        </FormField>
+        {!isCustomer && (
+          <FormField
+            label="Nasabah"
+            name="user_id"
+            value={form.user_id}
+            onChange={updateField}
+            error={getFirstError(fieldErrors, "user_id")}
+          >
+            <option value="">Pilih nasabah...</option>
+
+            {customers.map((customer) => (
+              <option key={customer.id} value={customer.id}>
+                {customer.name}
+              </option>
+            ))}
+          </FormField>
+        )}
 
         {getFirstError(fieldErrors, "items") && (
           <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
@@ -173,6 +216,7 @@ const TransactionCreateModal = ({
                 }
               >
                 <option value="">Pilih kategori...</option>
+
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -201,7 +245,6 @@ const TransactionCreateModal = ({
                     type="button"
                     onClick={() => removeItem(index)}
                     className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-700 transition hover:bg-red-200"
-                    aria-label="Hapus item"
                   >
                     <MdClose size={20} />
                   </button>
@@ -214,15 +257,19 @@ const TransactionCreateModal = ({
         {estimate.price > 0 && (
           <div className="rounded-2xl border border-[#97c459] bg-[#eaf3de] p-4 text-[#3b6d11]">
             <p className="mb-3 text-sm font-semibold">Estimasi</p>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-white/65 p-3">
                 <p className="text-xs font-semibold opacity-70">Nilai</p>
+
                 <p className="mt-1 font-bold">
                   {formatCurrency(estimate.price)}
                 </p>
               </div>
+
               <div className="rounded-xl bg-white/65 p-3">
                 <p className="text-xs font-semibold opacity-70">Poin</p>
+
                 <p className="mt-1 font-bold">
                   +{formatNumber(Math.round(estimate.points))}
                 </p>
