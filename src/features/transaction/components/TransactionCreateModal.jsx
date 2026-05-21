@@ -139,9 +139,12 @@ const TransactionCreateModal = ({
       payload.user_id = form.user_id;
     }
 
-    await onSubmit(payload);
-
-    setForm(createEmptyForm(isCustomer));
+    try {
+      await onSubmit(payload);
+      setForm(createEmptyForm(isCustomer));
+    } catch {
+      // Keep current form values so users can correct and resubmit.
+    }
   };
 
   return (
@@ -244,6 +247,7 @@ const TransactionCreateModal = ({
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
+                    aria-label={`Hapus item sampah ${index + 1}`}
                     className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-700 transition hover:bg-red-200"
                   >
                     <MdClose size={20} />

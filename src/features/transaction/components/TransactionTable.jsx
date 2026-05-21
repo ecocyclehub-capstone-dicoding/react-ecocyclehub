@@ -118,6 +118,9 @@ const TransactionTable = ({
               "verified_by_id",
             ]);
 
+            const rowActionLocked =
+              verifyingId === item.id || rejectingId === item.id;
+
             return (
               <tr key={item.id} className="border-t border-gray-100">
                 <td className="p-4 align-middle font-mono text-xs text-gray-500">
@@ -192,7 +195,7 @@ const TransactionTable = ({
                           <button
                             type="button"
                             onClick={() => onVerify(item.id)}
-                            disabled={verifyingId === item.id}
+                            disabled={rowActionLocked}
                             className="rounded-xl bg-[#1d9e75] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0f6e56] disabled:opacity-60"
                           >
                             {verifyingId === item.id
@@ -205,7 +208,7 @@ const TransactionTable = ({
                           <button
                             type="button"
                             onClick={() => onReject(item.id)}
-                            disabled={rejectingId === item.id}
+                            disabled={rowActionLocked}
                             className="rounded-xl bg-red-100 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-200 disabled:opacity-60"
                           >
                             {rejectingId === item.id
