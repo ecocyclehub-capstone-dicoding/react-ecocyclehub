@@ -375,24 +375,40 @@ const OfficerTransactionsPage = () => {
           )}
         </section>
 
-        {/* HISTORY */}
+        {/* History Transactions */}
         <section className="space-y-4">
           <div>
-            <h2 className="text-xl font-bold text-[#0d4f2c]">
+            <h2 className="text-xl font-bold text-[`#0d4f2c`]">
               Riwayat Semua Transaksi
             </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Semua transaksi dari seluruh status.
+            </p>
           </div>
 
-          {!historyLoading && !historyError && (
-            <>
-              <TransactionTable data={historyTransactions} />
+          {historyError && (
+            <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
+              {historyError}
+            </div>
+          )}
 
-              <Pagination
-                page={historyPage}
-                totalPages={historyPagination?.total_pages || 1}
-                onPageChange={setHistoryPage}
-              />
-            </>
+          {historyLoading ? (
+            <div className="rounded-2xl bg-white p-6 text-sm font-medium text-gray-500 shadow-sm">
+              Loading...
+            </div>
+          ) : (
+            !historyError && (
+              <>
+                <TransactionTable data={historyTransactions} />
+
+                <Pagination
+                  page={historyPage}
+                  totalPages={historyPagination?.total_pages || 1}
+                  onPageChange={setHistoryPage}
+                />
+              </>
+            )
           )}
         </section>
       </div>
