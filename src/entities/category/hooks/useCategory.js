@@ -1,29 +1,22 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { categoryApi } from "../api/category.api";
-
 import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useCategory = () => {
   const [categories, setCategories] = useState([]);
-
-  const [pagination, setPagination] = useState(null);
-
   const [isFetching, setIsFetching] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
-
   const [error, setError] = useState(null);
 
-  const getCategories = useCallback(async (params = {}) => {
+  const getCategories = useCallback(async () => {
     try {
+      setError(null);
       setIsFetching(true);
 
-      const res = await categoryApi.getCategories(params);
+      const res = await categoryApi.getCategories();
 
       setCategories(res.data || []);
-      setPagination(res.pagination || null);
-
-      setError(null);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to fetch categories"));
     } finally {
@@ -34,14 +27,11 @@ export const useCategory = () => {
   const createCategory = async (payload) => {
     try {
       setIsMutating(true);
-
       const res = await categoryApi.createCategory(payload);
 
-      return res;
-    } catch (err) {
-      setError(getApiErrorMessage(err, "Failed to create category"));
+      await getCategories();
 
-      throw err;
+      return res;
     } finally {
       setIsMutating(false);
     }
@@ -50,14 +40,11 @@ export const useCategory = () => {
   const updateCategory = async (id, payload) => {
     try {
       setIsMutating(true);
-
       const res = await categoryApi.updateCategory(id, payload);
 
-      return res;
-    } catch (err) {
-      setError(getApiErrorMessage(err, "Failed to update category"));
+      await getCategories();
 
-      throw err;
+      return res;
     } finally {
       setIsMutating(false);
     }
@@ -66,30 +53,29 @@ export const useCategory = () => {
   const deleteCategory = async (id) => {
     try {
       setIsMutating(true);
+      await categoryApi.deleteCategory(id);
 
-      const res = await categoryApi.deleteCategory(id);
-
-      return res;
-    } catch (err) {
-      setError(getApiErrorMessage(err, "Failed to delete category"));
-
-      throw err;
+      setCategories((prev) => prev.filter((item) => item.id !== id));
     } finally {
       setIsMutating(false);
     }
   };
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      getCategories();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [getCategories]);
+
   return {
     categories,
-    pagination,
-
     isFetching,
     isMutating,
-
     error,
 
     getCategories,
-
     createCategory,
     updateCategory,
     deleteCategory,
