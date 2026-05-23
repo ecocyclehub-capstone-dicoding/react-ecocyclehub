@@ -6,23 +6,31 @@ import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useTransaction = () => {
   const [transactions, setTransactions] = useState([]);
+
   const [pagination, setPagination] = useState(null);
 
   const [isFetching, setIsFetching] = useState(false);
+
   const [isMutating, setIsMutating] = useState(false);
 
   const [error, setError] = useState(null);
 
   const [fieldErrors, setFieldErrors] = useState({});
 
+  // ===============================
+  // ADMIN / OFFICER
+  // ===============================
+
   const getTransactions = useCallback(async (params = {}) => {
     try {
       setIsFetching(true);
+
       setError(null);
 
       const res = await transactionApi.getAll(params);
 
       setTransactions(res.data || []);
+
       setPagination(res.pagination || null);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to fetch transactions"));
@@ -31,15 +39,21 @@ export const useTransaction = () => {
     }
   }, []);
 
-  const getTransactionHistory = useCallback(async () => {
+  // ===============================
+  // CUSTOMER ONLY
+  // ===============================
+
+  const getTransactionHistory = useCallback(async (params = {}) => {
     try {
       setIsFetching(true);
+
       setError(null);
 
-      const res = await transactionApi.getHistory();
+      const res = await transactionApi.getHistory(params);
 
       setTransactions(res.data || []);
-      setPagination(res.pagination || null);
+
+      setPagination(null);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to fetch transaction history"));
     } finally {
@@ -47,15 +61,24 @@ export const useTransaction = () => {
     }
   }, []);
 
-  const createTransaction = async (payload, refreshParams) => {
+  // ===============================
+  // CREATE
+  // ===============================
+
+  const createTransaction = async (payload, refreshParams = null) => {
     try {
       setIsMutating(true);
+
       setError(null);
+
       setFieldErrors({});
 
       const res = await transactionApi.create(payload);
 
-      await getTransactions(refreshParams);
+      // optional refresh
+      if (refreshParams) {
+        await getTransactions(refreshParams);
+      }
 
       return res;
     } catch (err) {
@@ -73,12 +96,15 @@ export const useTransaction = () => {
     }
   };
 
-  const verifyTransaction = async (id) => {
+  // ===============================
+  // VERIFY
+  // ===============================
+
+  const verifyTransaction = async (id, password) => {
     try {
       setIsMutating(true);
-      setError(null);
 
-      const res = await transactionApi.verify(id);
+      const res = await transactionApi.verify(id, password);
 
       setTransactions((prev) =>
         prev.map((item) =>
@@ -93,17 +119,21 @@ export const useTransaction = () => {
 
       return res;
     } catch (err) {
-      setError(getApiErrorMessage(err, "Failed to verify transaction"));
-
+      // password salah cukup dilempar ke modal
       throw err;
     } finally {
       setIsMutating(false);
     }
   };
 
+  // ===============================
+  // REJECT
+  // ===============================
+
   const rejectTransaction = async (id) => {
     try {
       setIsMutating(true);
+
       setError(null);
 
       const res = await transactionApi.reject(id);
@@ -129,13 +159,12 @@ export const useTransaction = () => {
     }
   };
 
-  const loading = isFetching || isMutating;
-
   return {
     transactions,
     pagination,
 
-    loading,
+    loading: isFetching || isMutating,
+
     isFetching,
     isMutating,
 
