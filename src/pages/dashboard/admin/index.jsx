@@ -13,9 +13,9 @@ import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
 import {
   HiUsers,
   HiDocumentText,
+  HiArrowPath,
   HiCurrencyDollar,
   HiTrophy,
-  HiTrash,
 } from "react-icons/hi2";
 
 const PAGE_SIZE = 5;
@@ -114,35 +114,35 @@ const AdminDashboardPage = () => {
       {/* Stats */}
       <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-5">
         <StatCard
-          title="Total Pengguna"
+          title="Total Users"
           value={dashboard.total_users || 0}
           icon={<HiUsers size={24} />}
           tone="blue"
         />
 
         <StatCard
-          title="Total Transaksi"
+          title="Transactions"
           value={dashboard.total_transactions || 0}
           icon={<HiDocumentText size={24} />}
           tone="green"
         />
 
         <StatCard
-          title="Total Volume Sampah"
+          title="Waste Volume"
           value={`${dashboard.total_weight || 0} kg`}
-          icon={<HiTrash size={24} />}
+          icon={<HiArrowPath size={24} />}
           tone="amber"
         />
 
         <StatCard
-          title="Total Point"
+          title="Points"
           value={`${dashboard.total_points || 0}`}
           icon={<HiTrophy size={24} />}
           tone="purple"
         />
 
         <StatCard
-          title="Uang Keluar"
+          title="Revenue"
           value={`Rp ${dashboard.total_balance.toLocaleString("id-ID")}`}
           icon={<HiCurrencyDollar size={24} />}
           tone="teal"

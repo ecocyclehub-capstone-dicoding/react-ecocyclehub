@@ -30,21 +30,13 @@ const CustomerDashboardPage = () => {
 
   const { data, loading, error } = useDashboard("customer");
 
-  const {
-    categories,
-    getCategories,
-    isFetching: categoriesLoading,
-  } = useCategory();
+  const { categories } = useCategory();
 
   const {
     transactions,
-
     isFetching: transactionsLoading,
-
     isMutating,
-
     fieldErrors,
-
     getTransactionHistory,
     createTransaction,
   } = useTransaction();
@@ -55,33 +47,20 @@ const CustomerDashboardPage = () => {
     getTransactionHistory();
   }, [getTransactionHistory]);
 
-  useEffect(() => {
-    getCategories({
-      page: 1,
-      page_size: 100,
-    });
-  }, [getCategories]);
-
   const dashboard = {
     total_points: data?.total_points ?? 0,
-
     total_balance: data?.total_balance ?? 0,
-
     total_transactions: data?.total_transactions ?? 0,
   };
 
   const recentTransactions = transactions.slice(0, 3);
 
   const handleCreate = async (payload) => {
-    try {
-      await createTransaction(payload);
+    await createTransaction(payload);
 
-      setModalOpen(false);
+    setModalOpen(false);
 
-      await getTransactionHistory();
-    } catch {
-      // handled in hook
-    }
+    await getTransactionHistory();
   };
 
   return (
@@ -159,14 +138,14 @@ const CustomerDashboardPage = () => {
         ) : (
           <TransactionTable data={recentTransactions} audience="customer" />
         )}
-    </div>
+      </div>
 
       <TransactionCreateModal
         open={modalOpen}
         audience="customer"
         categories={categories}
         fieldErrors={fieldErrors}
-        loading={isMutating || categoriesLoading}
+        loading={isMutating}
         onClose={() => setModalOpen(false)}
         onSubmit={handleCreate}
       />

@@ -1,16 +1,8 @@
 import { axiosInstance } from "@/shared/api/axiosInstance";
 
 export const categoryApi = {
-  getCategories: async (params = {}) => {
-    const res = await axiosInstance.get("/categories/", {
-      params,
-    });
-
-    return res.data;
-  },
-
-  getCategoryById: async (id) => {
-    const res = await axiosInstance.get(`/categories/${id}/`);
+  getCategories: async () => {
+    const res = await axiosInstance.get("/categories/");
 
     return res.data;
   },
