@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 
@@ -7,6 +7,7 @@ import { adminSidebar } from "@/features/dashboard/components/configs/admin.conf
 import TransactionTable from "@/features/transaction/components/TransactionTable";
 
 import Pagination from "@/shared/components/Pagination";
+import SearchBar from "@/shared/components/SearchBar";
 
 import { useTransaction } from "@/entities/transaction/hooks/useTransaction";
 
@@ -33,24 +34,42 @@ const AdminTransactionsPage = () => {
 
   const [status, setStatus] = useState("");
 
+  const [searchUser, setSearchUser] = useState("");
+
+  const [handledBy, setHandledBy] = useState("");
+  const [verifiedBy, setVerifiedBy] = useState("");
+
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   const [verifyingId, setVerifyingId] = useState(null);
 
   const [rejectingId, setRejectingId] = useState(null);
 
-  useEffect(() => {
-    getTransactions({
+  const params = useMemo(
+    () => ({
       page,
       page_size: TRANSACTION_PAGE_SIZE,
+
       ...(status ? { status } : {}),
-    });
-  }, [getTransactions, page, status]);
+
+      ...(searchUser ? { user_name: searchUser } : {}),
+
+      ...(handledBy ? { handled_by: handledBy } : {}),
+      ...(verifiedBy ? { verified_by: verifiedBy } : {}),
+
+      ...(startDate ? { start_date: startDate } : {}),
+      ...(endDate ? { end_date: endDate } : {}),
+    }),
+    [page, status, searchUser, handledBy, verifiedBy, startDate, endDate],
+  );
+
+  useEffect(() => {
+    getTransactions(params);
+  }, [getTransactions, params]);
 
   const refreshTransactions = async () => {
-    await getTransactions({
-      page,
-      page_size: TRANSACTION_PAGE_SIZE,
-      ...(status ? { status } : {}),
-    });
+    await getTransactions(params);
   };
 
   const handleVerify = async (id) => {
@@ -60,6 +79,8 @@ const AdminTransactionsPage = () => {
       await verifyTransaction(id);
 
       await refreshTransactions();
+    } catch {
+      // Error handled in hook
     } finally {
       setVerifyingId(null);
     }
@@ -72,6 +93,8 @@ const AdminTransactionsPage = () => {
       await rejectTransaction(id);
 
       await refreshTransactions();
+    } catch {
+      // Error handled in hook
     } finally {
       setRejectingId(null);
     }
@@ -87,56 +110,114 @@ const AdminTransactionsPage = () => {
     <DashboardLayout
       sidebar={adminSidebar}
       title="Manajemen Transaksi"
-      subtitle="Data transaksi."
+      subtitle="Kelola dan monitor seluruh transaksi EcoCycle Hub."
     >
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 rounded-2xl border border-[#ded6ad] bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-[#639922]">
-              Total transaksi
-            </p>
+        {/* HEADER */}
+        <div className="rounded-2xl border border-[#ded6ad] bg-white p-6 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-[#639922]">
+                Total transaksi
+              </p>
 
-            <h1 className="mt-1 text-3xl font-bold text-[#0d4f2c]">
-              {(pagination?.count ?? transactions.length).toLocaleString(
-                "id-ID",
-              )}
-            </h1>
+              <h1 className="mt-1 text-3xl font-bold text-[#0d4f2c]">
+                {(pagination?.count || 0).toLocaleString("id-ID")}
+              </h1>
 
-            <p className="mt-2 text-sm text-gray-500">
-              Menampilkan {transactions.length} data per halaman dari server.
-            </p>
+              <p className="mt-2 text-sm text-gray-500">
+                Filter transaksi berdasarkan status, user, petugas, dan tanggal.
+              </p>
+            </div>
           </div>
 
-          <select
-            value={status}
-            onChange={handleStatusChange}
-            className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-[#173c28] outline-none focus:border-[#14532d]"
-          >
-            {TRANSACTION_STATUS_OPTIONS.map((option) => (
-              <option key={option.label} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          {/* FILTER */}
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <SearchBar
+              placeholder="Cari nama user..."
+              value={searchUser}
+              onSearch={(value) => {
+                setSearchUser(value);
+                setPage(1);
+              }}
+            />
+
+            <input
+              type="text"
+              value={handledBy}
+              onChange={(event) => {
+                setHandledBy(event.target.value);
+                setPage(1);
+              }}
+              placeholder="Handled by..."
+              className="h-12 rounded-2xl border border-gray-200 bg-white px-4 text-sm font-medium text-[#173c28] outline-none transition focus:border-[#14532d]"
+            />
+
+            <input
+              type="text"
+              value={verifiedBy}
+              onChange={(event) => {
+                setVerifiedBy(event.target.value);
+                setPage(1);
+              }}
+              placeholder="Verified by..."
+              className="h-12 rounded-2xl border border-gray-200 bg-white px-4 text-sm font-medium text-[#173c28] outline-none transition focus:border-[#14532d]"
+            />
+
+            <select
+              value={status}
+              onChange={handleStatusChange}
+              className="h-12 rounded-2xl border border-gray-200 bg-white px-4 text-sm font-medium text-[#173c28] outline-none transition focus:border-[#14532d]"
+            >
+              {TRANSACTION_STATUS_OPTIONS.map((option) => (
+                <option key={option.label} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="date"
+              value={startDate}
+              onChange={(event) => {
+                setStartDate(event.target.value);
+                setPage(1);
+              }}
+              className="h-12 rounded-2xl border border-gray-200 bg-white px-4 text-sm font-medium text-[#173c28] outline-none transition focus:border-[#14532d]"
+            />
+
+            <input
+              type="date"
+              value={endDate}
+              onChange={(event) => {
+                setEndDate(event.target.value);
+                setPage(1);
+              }}
+              className="h-12 rounded-2xl border border-gray-200 bg-white px-4 text-sm font-medium text-[#173c28] outline-none transition focus:border-[#14532d]"
+            />
+          </div>
         </div>
 
+        {/* LOADING */}
         {isFetching && (
           <div className="rounded-2xl bg-white p-6 text-sm font-medium text-gray-500 shadow-sm">
             Loading...
           </div>
         )}
 
+        {/* ERROR */}
         {error && (
           <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
             {error}
           </div>
         )}
 
+        {/* TABLE */}
         {!isFetching && !error && (
           <>
             {transactions.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-[#ded6ad] bg-white py-10 text-center text-sm font-medium text-gray-500 shadow-sm">
-                No transactions found.
+                Tidak ada transaksi ditemukan.
               </div>
             ) : (
               <>
