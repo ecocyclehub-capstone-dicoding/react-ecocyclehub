@@ -83,7 +83,10 @@ const OfficerCategoriesPage = () => {
               </p>
 
               <h1 className="mt-1 text-3xl font-bold text-[#0d4f2c]">
-                {(pagination?.count || 0).toLocaleString("id-ID")} Kategori
+                {(pagination?.count ?? categories.length).toLocaleString(
+                  "id-ID",
+                )}{" "}
+                Kategori
               </h1>
 
               <p className="mt-2 text-sm text-gray-500">
