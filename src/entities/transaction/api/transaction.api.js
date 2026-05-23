@@ -1,40 +1,29 @@
 import { axiosInstance } from "@/shared/api/axiosInstance";
 
 export const transactionApi = {
-  getHistory: async (params = {}) => {
-    const res = await axiosInstance.get("/transactions/", {
-      params,
-    });
-
+  getHistory: async () => {
+    const res = await axiosInstance.get("/transactions/");
     return res.data;
   },
 
   getAll: async (params = {}) => {
-    const res = await axiosInstance.get("/transactions/all/", {
-      params,
-    });
-
+    const res = await axiosInstance.get("/transactions/all/", { params });
     return res.data;
   },
 
   getById: async (transactionId) => {
     const res = await axiosInstance.get(`/transactions/all/${transactionId}/`);
-
     return res.data;
   },
 
   create: async (payload) => {
     const res = await axiosInstance.post("/transactions/", payload);
-
     return res.data;
   },
 
-  verify: async (transactionId, password) => {
+  verify: async (transactionId) => {
     const res = await axiosInstance.post(
       `/transactions/${transactionId}/verify/`,
-      {
-        password,
-      },
     );
 
     return res.data;
