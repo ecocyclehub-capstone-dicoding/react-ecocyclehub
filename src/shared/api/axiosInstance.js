@@ -51,7 +51,7 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (originalRequest.url?.includes("/auth/refresh-token/")) {
+    if (originalRequest.url?.includes("/auth/refresh/")) {
       tokenService.clearTokens();
       window.location.href = "/login";
       return Promise.reject(error);
@@ -74,18 +74,27 @@ axiosInstance.interceptors.response.use(
     try {
       const refreshToken = tokenService.getRefreshToken();
 
-      const res = await axios.post(`${BASE_URL}/auth/refresh-token/`, {
-        refresh_token: refreshToken,
+      if (!refreshToken) {
+        throw new Error("No refresh token");
+      }
+
+      const res = await axios.post(`${BASE_URL}/auth/refresh/`, {
+        refresh: refreshToken,
       });
 
-      const { access_token } = res.data.data;
+      const accessToken = res.data?.data?.access_token;
 
-      tokenService.setTokens(access_token, refreshToken);
+      if (!accessToken) {
+        throw new Error("No access token returned");
+      }
 
-      axiosInstance.defaults.headers.Authorization = `Bearer ${access_token}`;
-      originalRequest.headers.Authorization = `Bearer ${access_token}`;
+      tokenService.setTokens(accessToken, refreshToken);
 
-      processQueue(null, access_token);
+      axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+      processQueue(null, accessToken);
 
       return axiosInstance(originalRequest);
     } catch (err) {
