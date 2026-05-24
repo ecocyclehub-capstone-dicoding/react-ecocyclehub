@@ -48,9 +48,31 @@ Frontend ini terhubung dengan backend REST API berbasis Django REST Framework.
 ```text
 src/
 +-- app/
+|   +-- provider/
+|   |   +-- routes/
+|   |
+|   +-- styles/
 |
 +-- entities/
+|   +-- auth/
+|   |   +-- api/
+|   |   +-- hooks/
+|   |   +-- lib/
+|   |
 |   +-- category/
+|   |   +-- api/
+|   |   +-- hooks/
+|   |
+|   +-- dashboard/
+|   |   +-- api/
+|   |   +-- hooks/
+|   |
+|   +-- gamification/
+|   |   +-- api/
+|   |   +-- hooks/
+|   |   +-- lib/
+|   |
+|   +-- leaderboard/
 |   |   +-- api/
 |   |   +-- hooks/
 |   |
@@ -64,24 +86,37 @@ src/
 |
 +-- features/
 |   +-- auth/
+|   |   +-- components/
+|   |
 |   +-- category/
+|   |   +-- components/
+|   |
 |   +-- dashboard/
+|   |   +-- components/
+|   |   +-- lib/
+|   |
 |   +-- transaction/
+|   |   +-- components/
+|   |   +-- lib/
+|   |
 |   +-- user/
+|       +-- components/
 |
 +-- pages/
-|
-+-- routes/
+|   +-- dashboard/
+|   |   +-- admin/
+|   |   +-- customer/
+|   |   +-- admin/
+|   |
+|   +-- login/
+|   +-- not-found/
+|   +-- register/
 |
 +-- shared/
 |   +-- components/
 |   +-- hooks/
 |   +-- lib/
 |   +-- services/
-|
-+-- styles/
-|
-+-- main.jsx
 ```
 
 ---
@@ -109,13 +144,13 @@ VITE_API_URL=https://your-production-api/api
 Clone repository:
 
 ```bash
-git clone https://github.com/username/ecocyclehub-frontend.git
+git clone https://github.com/ecocyclehub-capstone-dicoding/react-ecocyclehub.git
 ```
 
 Masuk ke folder project:
 
 ```bash
-cd ecocyclehub-frontend
+cd react-ecocyclehub
 ```
 
 Install dependency:
