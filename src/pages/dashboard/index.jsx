@@ -1,21 +1,16 @@
 import { Navigate } from "react-router-dom";
+import { useAuthContext } from "@/app/provider/AuthContext";
+import { getDashboardPathByRole } from "@/entities/auth/lib/roleRedirect";
 
 const DashboardPage = () => {
-  const role = localStorage.getItem("role");
+  const { user } = useAuthContext();
+  const role = user?.role?.key;
 
   if (!role) {
     return <Navigate to="/login" replace />;
   }
 
-  if (role === "admin") {
-    return <Navigate to="/admin/dashboard" replace />;
-  }
-
-  if (role === "officer") {
-    return <Navigate to="/officer/dashboard" replace />;
-  }
-
-  return <Navigate to="/customer/dashboard" replace />;
+  return <Navigate to={getDashboardPathByRole(role) || "/login"} replace />;
 };
 
 export default DashboardPage;

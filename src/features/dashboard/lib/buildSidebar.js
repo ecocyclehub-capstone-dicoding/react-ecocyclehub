@@ -4,6 +4,9 @@ export const buildSidebar = (config, user) => {
   return {
     ...config,
 
+    menus: (config.menus || []).filter(
+      (menu) => !menu.permission || can(user, menu.permission),
+    ),
     profile: {
       name: user?.name || "User",
 
@@ -11,3 +14,4 @@ export const buildSidebar = (config, user) => {
     },
   };
 };
+import { can } from "@/shared/lib/permissions";

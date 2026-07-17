@@ -111,9 +111,9 @@ export const useAuth = () => {
 
       const res = await authApi.register(data);
 
-      setMessage(res.data.message);
+      setMessage(res.message);
 
-      return res.data;
+      return res;
     } catch (err) {
       const res = err.response?.data;
 

@@ -2,7 +2,7 @@ import { axiosInstance } from "@/shared/api/axiosInstance";
 
 export const transactionApi = {
   getHistory: async (params = {}) => {
-    const res = await axiosInstance.get("/transactions/", {
+    const res = await axiosInstance.get("/api/transactions/", {
       params,
     });
 
@@ -10,7 +10,7 @@ export const transactionApi = {
   },
 
   getAll: async (params = {}) => {
-    const res = await axiosInstance.get("/transactions/all/", {
+    const res = await axiosInstance.get("/api/transactions/all/", {
       params,
     });
 
@@ -18,20 +18,20 @@ export const transactionApi = {
   },
 
   getById: async (transactionId) => {
-    const res = await axiosInstance.get(`/transactions/all/${transactionId}/`);
+    const res = await axiosInstance.get(`/api/transactions/all/${transactionId}/`);
 
     return res.data;
   },
 
   create: async (payload) => {
-    const res = await axiosInstance.post("/transactions/", payload);
+    const res = await axiosInstance.post("/api/transactions/", payload);
 
     return res.data;
   },
 
   verify: async (transactionId, password) => {
     const res = await axiosInstance.post(
-      `/transactions/${transactionId}/verify/`,
+      `/api/transactions/${transactionId}/verify/`,
       {
         password,
       },
@@ -40,9 +40,10 @@ export const transactionApi = {
     return res.data;
   },
 
-  reject: async (transactionId) => {
+  reject: async (transactionId, password) => {
     const res = await axiosInstance.post(
-      `/transactions/${transactionId}/reject/`,
+      `/api/transactions/${transactionId}/reject/`,
+      { password },
     );
 
     return res.data;

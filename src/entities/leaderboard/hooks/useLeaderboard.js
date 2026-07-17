@@ -1,39 +1,22 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { leaderboardApi } from "../api/leaderboard.api";
 
 import { getApiErrorMessage } from "@/shared/lib/apiError";
 
 export const useLeaderboard = (limit = 10) => {
-  const [leaderboard, setLeaderboard] = useState([]);
-
-  const [isFetching, setIsFetching] = useState(false);
-
-  const [error, setError] = useState(null);
-
-  const getLeaderboard = useCallback(async () => {
-    try {
-      setError(null);
-      setIsFetching(true);
-
-      const res = await leaderboardApi.getLeaderboard(limit);
-
-      setLeaderboard(res.data || []);
-    } catch (err) {
-      setError(getApiErrorMessage(err, "Failed to fetch leaderboard"));
-    } finally {
-      setIsFetching(false);
-    }
-  }, [limit]);
-
-  useEffect(() => {
-    getLeaderboard();
-  }, [getLeaderboard]);
+  const query = useQuery({
+    queryKey: ["leaderboard", limit],
+    queryFn: () => leaderboardApi.getLeaderboard(limit),
+    select: (response) => response.data || [],
+  });
 
   return {
-    leaderboard,
-    isFetching,
-    error,
-    refreshLeaderboard: getLeaderboard,
+    leaderboard: query.data || [],
+    isFetching: query.isFetching,
+    error: query.error
+      ? getApiErrorMessage(query.error, "Failed to fetch leaderboard")
+      : null,
+    refreshLeaderboard: query.refetch,
   };
 };

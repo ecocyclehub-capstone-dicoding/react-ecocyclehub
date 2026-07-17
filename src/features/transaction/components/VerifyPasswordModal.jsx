@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const VerifyPasswordModal = ({ open, loading, error, onClose, onSubmit }) => {
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    if (open) {
-      setPassword("");
-    }
-  }, [open]);
+  const handleClose = () => {
+    setPassword("");
+    onClose?.();
+  };
 
   const handleSubmit = async () => {
     if (!password.trim()) return;
@@ -61,7 +60,7 @@ const VerifyPasswordModal = ({ open, loading, error, onClose, onSubmit }) => {
         <div className="mt-8 flex justify-end gap-3">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={loading}
             className="rounded-2xl border border-gray-200 px-5 py-3 font-semibold text-gray-600 transition hover:bg-gray-100 disabled:opacity-50"
           >

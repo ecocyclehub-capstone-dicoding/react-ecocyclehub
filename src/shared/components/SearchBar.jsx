@@ -17,10 +17,6 @@ const SearchBar = ({
     onSearch?.(debouncedKeyword);
   }, [debouncedKeyword, onSearch]);
 
-  useEffect(() => {
-    setKeyword(value);
-  }, [value]);
-
   const clearSearch = () => {
     setKeyword("");
     onSearch?.("");

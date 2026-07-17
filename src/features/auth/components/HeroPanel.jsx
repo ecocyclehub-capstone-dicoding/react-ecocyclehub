@@ -30,7 +30,11 @@ const HeroPanel = ({ image, title, subtitle }) => {
 
           <div className="flex gap-3 flex-wrap">
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20">
-              <MdNaturePeople size={13} className="text-white" aria-hidden="true" />
+              <MdNaturePeople
+                size={13}
+                className="text-white"
+                aria-hidden="true"
+              />
               <span className="text-xs text-white">Carbon Neutral</span>
             </div>
 

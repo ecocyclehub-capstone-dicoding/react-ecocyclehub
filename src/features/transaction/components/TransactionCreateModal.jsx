@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { MdAdd, MdClose } from "react-icons/md";
 
 import FormField from "@/shared/components/FormField";
@@ -6,7 +6,7 @@ import ModalShell from "@/shared/components/ModalShell";
 
 import { formatCurrency, formatNumber } from "@/shared/lib/formatters";
 
-const createEmptyForm = (isCustomer = false) => ({
+const createEmptyForm = () => ({
   user_id: "",
   items: [{ category_id: "", weight: "" }],
 });
@@ -29,13 +29,7 @@ const TransactionCreateModal = ({
 }) => {
   const isCustomer = audience === "customer";
 
-  const [form, setForm] = useState(createEmptyForm(isCustomer));
-
-  useEffect(() => {
-    if (open) {
-      setForm(createEmptyForm(isCustomer));
-    }
-  }, [open, isCustomer]);
+  const [form, setForm] = useState(createEmptyForm);
 
   const estimate = useMemo(
     () =>
@@ -120,7 +114,7 @@ const TransactionCreateModal = ({
   };
 
   const handleClose = () => {
-    setForm(createEmptyForm(isCustomer));
+    setForm(createEmptyForm());
 
     onClose?.();
   };
@@ -141,7 +135,7 @@ const TransactionCreateModal = ({
 
     try {
       await onSubmit(payload);
-      setForm(createEmptyForm(isCustomer));
+      setForm(createEmptyForm());
     } catch {
       // Keep current form values so users can correct and resubmit.
     }

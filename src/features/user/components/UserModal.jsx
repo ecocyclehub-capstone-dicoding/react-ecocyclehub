@@ -50,9 +50,12 @@ const UserModalForm = ({ onClose, onSubmit, loading, selectedUser }) => {
       role_key: form.role_key,
     };
 
-    if (form.password) {
-      payload.password = form.password;
+    if (!form.password) {
+      alert("Password is required by the server for create and update");
+      return;
     }
+
+    payload.password = form.password;
 
     await onSubmit(payload);
   };

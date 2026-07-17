@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 
 import DashboardLayout from "@/features/dashboard/components/layout/DashboardLayout";
 

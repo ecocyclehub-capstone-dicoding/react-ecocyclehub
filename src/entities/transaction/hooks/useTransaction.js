@@ -53,7 +53,7 @@ export const useTransaction = () => {
 
       setTransactions(res.data || []);
 
-      setPagination(null);
+      setPagination(res.pagination || null);
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to fetch transaction history"));
     } finally {
@@ -118,9 +118,6 @@ export const useTransaction = () => {
       );
 
       return res;
-    } catch (err) {
-      // password salah cukup dilempar ke modal
-      throw err;
     } finally {
       setIsMutating(false);
     }
@@ -130,13 +127,13 @@ export const useTransaction = () => {
   // REJECT
   // ===============================
 
-  const rejectTransaction = async (id) => {
+  const rejectTransaction = async (id, password) => {
     try {
       setIsMutating(true);
 
       setError(null);
 
-      const res = await transactionApi.reject(id);
+      const res = await transactionApi.reject(id, password);
 
       setTransactions((prev) =>
         prev.map((item) =>

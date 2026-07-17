@@ -1,7 +1,8 @@
 import axios from "axios";
 import { tokenService } from "@/shared/lib/tokenService";
+import { userSession } from "@/shared/lib/userSession";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -39,21 +40,15 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    const isAuthRoute =
-      originalRequest.url?.includes("/auth/login/") ||
-      originalRequest.url?.includes("/auth/register/");
+    const isAuthRoute = ["/api/auth/login/", "/api/auth/register/", "/api/auth/refresh/", "/api/auth/logout/"].some(
+      (path) => originalRequest.url?.includes(path),
+    );
 
     if (isAuthRoute) {
       return Promise.reject(error);
     }
 
     if (error.response?.status !== 401 || originalRequest._retry) {
-      return Promise.reject(error);
-    }
-
-    if (originalRequest.url?.includes("/auth/refresh/")) {
-      tokenService.clearTokens();
-      window.location.href = "/login";
       return Promise.reject(error);
     }
 
@@ -78,17 +73,18 @@ axiosInstance.interceptors.response.use(
         throw new Error("No refresh token");
       }
 
-      const res = await axios.post(`${BASE_URL}/auth/refresh/`, {
+      const res = await axios.post(`${BASE_URL}/api/auth/refresh/`, {
         refresh: refreshToken,
       });
 
       const accessToken = res.data?.data?.access_token;
+      const rotatedRefreshToken = res.data?.data?.refresh_token;
 
-      if (!accessToken) {
-        throw new Error("No access token returned");
+      if (!accessToken || !rotatedRefreshToken) {
+        throw new Error("Incomplete rotated token response");
       }
 
-      tokenService.setTokens(accessToken, refreshToken);
+      tokenService.setTokens(accessToken, rotatedRefreshToken);
 
       axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
@@ -100,6 +96,7 @@ axiosInstance.interceptors.response.use(
     } catch (err) {
       processQueue(err, null);
       tokenService.clearTokens();
+      userSession.clearUser();
       window.location.href = "/login";
       return Promise.reject(err);
     } finally {

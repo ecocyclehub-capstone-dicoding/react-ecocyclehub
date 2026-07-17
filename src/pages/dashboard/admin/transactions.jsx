@@ -87,10 +87,12 @@ const AdminTransactionsPage = () => {
   };
 
   const handleReject = async (id) => {
+    const password = window.prompt("Masukkan password akun untuk menolak transaksi:");
+    if (!password) return;
     try {
       setRejectingId(id);
 
-      await rejectTransaction(id);
+      await rejectTransaction(id, password);
 
       await refreshTransactions();
     } catch {

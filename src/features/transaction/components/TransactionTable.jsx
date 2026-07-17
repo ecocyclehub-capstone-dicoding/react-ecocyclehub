@@ -5,6 +5,8 @@ import {
 } from "@/shared/lib/formatters";
 
 import StatusBadge from "@/features/dashboard/components/common/StatusBadge";
+import { useAuthContext } from "@/app/provider/AuthContext";
+import { can } from "@/shared/lib/permissions";
 
 import {
   getTransactionActorLabel,
@@ -56,8 +58,12 @@ const TransactionTable = ({
 
   audience = "staff",
 }) => {
+  const { user } = useAuthContext();
+  const canVerify = can(user, "verify_transaction");
+  const canReject = can(user, "reject_transaction");
   const showAction =
-    typeof onVerify === "function" || typeof onReject === "function";
+    (canVerify && typeof onVerify === "function") ||
+    (canReject && typeof onReject === "function");
 
   const showStaffColumns = audience !== "customer";
 
@@ -191,7 +197,7 @@ const TransactionTable = ({
                   <td className="p-4 align-middle">
                     {item.status === "pending" ? (
                       <div className="flex items-center justify-center gap-2">
-                        {typeof onVerify === "function" && (
+                        {canVerify && typeof onVerify === "function" && (
                           <button
                             type="button"
                             onClick={() => onVerify(item.id)}
@@ -204,7 +210,7 @@ const TransactionTable = ({
                           </button>
                         )}
 
-                        {typeof onReject === "function" && (
+                        {canReject && typeof onReject === "function" && (
                           <button
                             type="button"
                             onClick={() => onReject(item.id)}
